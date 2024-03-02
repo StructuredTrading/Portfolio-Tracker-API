@@ -1,6 +1,8 @@
 # <center>Portfolio Tracker API</center>
 
-
+<br>
+<br>
+<br>
 
 ## R1 Identification of the problem you are trying to solve by building this particular app.
 
@@ -37,7 +39,29 @@ Uses strong security measures to protect users' financial information, offering 
 
 This app aims to make investment management more straightforward, informed, and secure, helping investors better achieve their financial goals.
 
+<br>
+<br>
+<br>
+
 ## R2 Why is it a problem that needs solving?
+
+The absence of a centralized and automated investment management system presents several significant challenges for investors, highlighting the necessity for a solution like the described app. Without such a system, investors face the following problems:
+
+#### Scattered Investment Data: 
+Investors typically have assets across different accounts, platforms, or asset classes like stocks, bonds, and cryptocurrencies. This dispersion makes it difficult to get a unified view of their financial health, leading to disjointed decision-making and potential oversight of critical portfolio diversification or rebalancing opportunities.
+
+#### Manual Portfolio Updates and Time Consumption: 
+Tracking and updating portfolio holdings manually is not only tedious but also prone to errors. Each buy or sell transaction requires manual entry, and keeping tabs on the current market value of diverse assets can be overwhelmingly complex, consuming valuable time that could be better spent on strategic investment analysis.
+
+#### Security and Privacy Concerns: 
+Given the sensitive nature of financial data, there's a legitimate concern over the security and privacy of using third-party services. Investors need assurance that their data is protected against unauthorized access and breaches.
+
+#### In summary:
+The absence of an efficient investment management system complicates portfolio tracking, exposes investors to the risk of making decisions based on outdated information, and ultimately hampers their ability to achieve optimal financial outcomes. The app addresses these issues by offering a secure, real-time, and user-friendly platform for investors to manage their portfolios more effectively, making it a critical solution for anyone looking to optimize their investment strategy. 
+
+<br>
+<br>
+<br>
 
 ## R3 Why have you chosen this database system. What are the drawbacks compared to others?
 
