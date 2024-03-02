@@ -14,6 +14,10 @@
 
 ## R6 An ERD for your app
 
+The described Entity-Relationship Diagram (ERD) outlines a database schema for managing investment portfolios, describing the relationships between users, their investment portfolio, the assets within those portfolios, and the transactions associated to those assets. Here's a overview:
+
+<img src="./Images/Portfolio-Tracker-API_ERD.png"></img>
+
 ## R7 Detail any third party services that your app will use
 
 ## R8 Describe your projects models in terms of the relationships they have with each other
