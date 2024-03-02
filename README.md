@@ -65,9 +65,21 @@ The absence of an efficient investment management system complicates portfolio t
 
 ## R3 Why have you chosen this database system. What are the drawbacks compared to others?
 
+<br>
+<br>
+<br>
+
 ## R4 Identify and discuss the key functionalities and benefits of an ORM
 
+<br>
+<br>
+<br>
+
 ## R5 Document all endpoints for your API
+
+<br>
+<br>
+<br>
 
 ## R6 An ERD for your app
 
@@ -75,10 +87,43 @@ The described Entity-Relationship Diagram (ERD) outlines a database schema for m
 
 <img src="./Images/Portfolio-Tracker-API_ERD.png"></img>
 
+<br>
+<br>
+<br>
+
 ## R7 Detail any third party services that your app will use
+
+<br>
+<br>
+<br>
 
 ## R8 Describe your projects models in terms of the relationships they have with each other
 
+<br>
+<br>
+<br>
+
 ## R9 Discuss the database relations to be implemented in your application
 
+<br>
+<br>
+<br>
+
 ## R10 Describe the way tasks are allocated and tracked in your project
+
+In the <b>Portfolio tracker API</b> project, task allocation and tracking are streamlined through the use of Trello, a project management tool that facilitates clear visualization of the project timeline and responsibilities. Here's how it's structured:
+
+#### Trello Board Setup: 
+I have set up a Trello board specifically for this project, divided into three lists that correspond to the three weeks of the project timeline. Each list represents a week, ensuring tasks are organized according to the timeframe in which they need to be completed.
+
+#### Weekly Lists and Daily Cards: 
+Within each weekly list, I have created cards that represent specific tasks or activities to be undertaken on particular days. These cards detail what needs to be done, and any relevant deadlines. This structure allows for a day-by-day breakdown of the project's progress.
+
+#### Tracking Progress: 
+Task's are sorted directly on Trello by using checklist's on cards with status's from "To Do" to "In Progress" and finally to "Done" as I complete their activities. This visual progression allows me to monitor the project's advancement in real-time and identify any areas that may require additional focus.
+
+#### Adapting to Changes: 
+Given the tight timeline, flexibility is crucial. The Trello board is reviewed and updated to reflect any changes in priorities or task allocations. This agile approach enables me to respond quickly to unforeseen challenges or adjustments in the project scope.
+
+#### Summary:
+By utilizing Trello in this structured yet flexible manner, I maintain a clear overview of the project's progress, ensure tasks are completed efficiently. This methodical approach to task alocation and tracking is instrumental in keeping the project on track within the constrained three-week timeframe.
