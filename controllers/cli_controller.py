@@ -4,6 +4,7 @@ from init import db, bcrypt
 from models.user import User
 from models.portfolio import Portfolio
 from models.asset import Asset
+from models.transaction import Transaction
 
 db_commands = Blueprint('db', __name__)
 
