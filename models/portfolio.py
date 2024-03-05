@@ -9,4 +9,4 @@ class Portfolio(db.Model):
     Holdings = db.Column(db.Integer)
     DateCreated = db.Column(db.Date) # Date the portfolio was created.
 
-    UserID = db.Column(db.Integer, db.ForeignKey('user.UserID'), nullable=False) # Foreign key 'user.UserID' tablename = 'user', key = 'UserID'
+    UserID = db.Column(db.Integer, db.ForeignKey("user.UserID"), nullable=False) # Foreign key 'user.UserID' tablename = 'user', key = 'UserID'
