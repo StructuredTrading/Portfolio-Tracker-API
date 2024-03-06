@@ -7,3 +7,5 @@ class Asset(db.Model):
     symbol = db.Column(db.String, nullable=False, unique=True)
     name = db.Column(db.String, nullable=False, unique=True)
     price = db.Column(db.Float, nullable=False)
+
+    transaction = db.relationship("Transaction", back_populates="asset", cascade="all, delete")
