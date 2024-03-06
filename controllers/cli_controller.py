@@ -30,7 +30,8 @@ def seed_tables():
     users = [
         User(
             email="admin@email.com",
-            password=bcrypt.generate_password_hash("123456").decode("utf-8")
+            password=bcrypt.generate_password_hash("123456").decode("utf-8"),
+            is_admin=True
         ),
         User(
             email="test@email.com",

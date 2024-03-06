@@ -6,6 +6,7 @@ class User(db.Model):
     userID = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String, nullable=False, unique=True)
     password = db.Column(db.String, nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
 
     portfolio = db.relationship("Portfolio", back_populates="user", cascade="all, delete")
 
