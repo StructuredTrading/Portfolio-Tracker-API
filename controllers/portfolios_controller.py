@@ -41,7 +41,7 @@ def create_portfolio():
 
 
 # Update a portfolio in portfolios table
-@portfolios_bp.route("/update/<int:portfolio_id>", methods=["PUT","PATCH"])
+@portfolios_bp.route("/update/<int:portfolio_id>", methods=["PUT","PATCH"]) #   /portfolios/update/<portfolio_id>
 @jwt_required()
 def update_portfolio(portfolio_id):
     # Retrieve body data from JSON
@@ -64,3 +64,20 @@ def update_portfolio(portfolio_id):
     else:
         # Return error msg
         return {"error": f"Portfolio with id '{portfolio_id}' not found"}, 404
+    
+
+# Delete a portfolio from portfolios table
+@portfolios_bp.route("/delete/<int:portfolio_id>", methods=["DELETE"]) #    /portfolios/delete/<portfolio_id>
+@jwt_required()
+def delete_portfolio(portfolio_id):
+    stmt = db.select(Portfolio).filter_by(portfolioID=portfolio_id)
+    portfolio = db.session.scalar(stmt)
+    if portfolio:
+        if str(portfolio.userID) != get_jwt_identity():
+            return {"error": f"Only the owner can delete the portfolio '{portfolio.name}' portfolio"}, 403
+        else:
+            db.session.delete(portfolio)
+            db.session.commit()
+            return {"message": f"Portfolio '{portfolio.name}' with portfolio ID '{portfolio.portfolioID}' has successfully been deleted."}, 200
+    else:
+        return {"error": f"Portfolio with ID '{portfolio_id}' not found."}, 404
