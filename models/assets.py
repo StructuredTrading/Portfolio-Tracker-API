@@ -1,4 +1,6 @@
-from init import db
+from marshmallow import fields
+
+from init import db, ma
 
 class Asset(db.Model):
     __tablename__ = "assets"
@@ -10,3 +12,13 @@ class Asset(db.Model):
 
     transaction = db.relationship("Transaction", back_populates="asset", cascade="all, delete")
     ownedasset = db.relationship("OwnedAsset", back_populates="asset", cascade="all,delete")
+
+
+class Asset_Schema(ma.Schema):
+
+    class Meta:
+        fields = ('assetID', 'symbol', 'name', 'price')
+        ordered=True
+
+asset_schema = Asset_Schema()
+assets_schema = Asset_Schema(many=True)
