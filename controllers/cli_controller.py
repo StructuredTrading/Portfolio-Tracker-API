@@ -86,24 +86,104 @@ def seed_tables():
         )
     
     db.session.add_all(assets)
+    print("Seeding assets table.")
 
-    portfolio = [
+    portfolios = [
         Portfolio(
             name="Admin Portfolio",
             description="A Portfolio that is owned by Admin.",
-            holdings=50000,
             date=date.today(),
-            user=users[0] # Foreign Key from users table
+            user=users[0] # set relational attribute "user" in Portfolio instance to relate to the first instance of class 'User' using the variable 'users'
         ),
         Portfolio(
             name="Test Portfolio",
             description="A Portfolio that is owned by test account.",
-            holdings=1000,
             date=date.today(),
-            user=users[1] # Foreign Key from users table
+            user=users[1] # set relational attribute "user" in Portfolio instance to relate to the second instance of class 'User' using the variable 'users'
         )
     ]
-    db.session.add_all(portfolio)
-    print("Seeding portfolio table.")
+
+    transactions = [
+        Transaction(
+            transactionType="buy",
+            quantity=10,
+            price=assets[0].price,
+            date=date.today(),
+            # assetID=assets[0],
+            asset=assets[0],
+            # portfolioID=portfolio[0]
+            portfolio=portfolios[0]
+        ),
+        Transaction(
+            transactionType="buy",
+            quantity=5,
+            price=assets[1].price,
+            date=date.today(),
+            asset=assets[1],
+            portfolio=portfolios[0]
+        ),
+        Transaction(
+            transactionType="buy",
+            quantity=30,
+            price=assets[21].price,
+            date=date.today(),
+            asset=assets[21],
+            portfolio=portfolios[0]
+        ),
+        Transaction(
+            transactionType="buy",
+            quantity=1000,
+            price=assets[9].price,
+            date=date.today(),
+            asset=assets[9],
+            portfolio=portfolios[0]
+        )
+    ]
+
+    # adjusting portfolio holdings according to transactions
+    portfolios[0].holdings=transactions[0].quantity * transactions[0].price + transactions[1].quantity * transactions[1].price + transactions[2].quantity * transactions[2].price + transactions[3].quantity * transactions[3].price
+
+    db.session.add_all(portfolios)
+    print("Seeding portfolios table.")
+    db.session.add_all(transactions)
+    print("Seeding transactions table.")
+
+    owned_asset = [
+        OwnedAsset(
+            symbol=assets[0].symbol,
+            name=assets[0].name,
+            quantity=transactions[0].quantity,
+            price=transactions[0].price,
+            asset=assets[0],
+            portfolio=portfolios[0]
+        ),
+        OwnedAsset(
+            symbol=assets[1].symbol,
+            name=assets[1].name,
+            quantity=transactions[1].quantity,
+            price=transactions[1].price,
+            asset=assets[1],
+            portfolio=portfolios[0]
+        ),
+        OwnedAsset(
+            symbol=assets[21].symbol,
+            name=assets[21].name,
+            quantity=transactions[2].quantity,
+            price=transactions[2].price,
+            asset=assets[21],
+            portfolio=portfolios[0]
+        ),
+        OwnedAsset(
+            symbol=assets[9].symbol,
+            name=assets[9].name,
+            quantity=transactions[3].quantity,
+            price=transactions[3].price,
+            asset=assets[9],
+            portfolio=portfolios[0]
+        )
+    ]
+
+    db.session.add_all(owned_asset)
+    print("Seeding ownedAssets table.")
     db.session.commit()
     print("Successfully seeded all tables in the database.")

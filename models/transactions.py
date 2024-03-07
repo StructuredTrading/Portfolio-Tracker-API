@@ -6,7 +6,7 @@ class Transaction(db.Model):
     transactionID = db.Column(db.Integer, primary_key=True)
     transactionType = db.Column(db.String(100), nullable=False, default="buy")
     quantity = db.Column(db.Integer, nullable=False)
-    price = db.Column(db.Integer, nullable=False)
+    price = db.Column(db.Float, nullable=False)
     date = db.Column(db.Date, nullable=False)
 
     portfolioID = db.Column(db.Integer, db.ForeignKey("portfolios.portfolioID"))
