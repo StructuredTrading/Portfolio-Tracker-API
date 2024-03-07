@@ -20,6 +20,25 @@ def get_all_portfolios():
     return portfolios_schema.dump(portfolios), 200
 
 
+# Retrieve portfolio by portfolioID
+@portfolios_bp.route("/search/<int:portfolio_id>", methods=["GET"]) #   /portfolios/search/<portfolio_id>
+@jwt_required()
+def search_for_portfolio(portfolio_id):
+    # Retrieve boy data from JSON
+        # SQL select statement to retrieve to retrieve portfolio entry in 'portfolios' table,
+    # that matches 'portfolio_id'
+    stmt = db.select(Portfolio).filter_by(portfolioID=portfolio_id)
+    portfolio = db.session.scalar(stmt)
+    # If portfolio exists
+    if portfolio:
+        if str(portfolio.userID) != get_jwt_identity():
+            return {"error": "Only the owner can retrieve this portfolio"}, 403
+        # Return portfolio
+        return portfolio_schema.dump(portfolio)
+    else:
+        return {"error" : f"Portfolio with id '{portfolio_id}' not found"}, 404
+
+
 # Create new portfolio in portfolios table
 @portfolios_bp.route("/create", methods=["POST"]) # /portfolios/create
 @jwt_required()
