@@ -12,7 +12,7 @@ class Asset(db.Model):
     price = db.Column(db.Float, nullable=False)
 
     transaction = db.relationship("Transaction", back_populates="asset", cascade="all, delete")
-    ownedasset = db.relationship("OwnedAsset", back_populates="asset", cascade="all,delete")
+    ownedAssets = db.relationship("OwnedAsset", back_populates="asset", cascade="all,delete")
 
 
 class Asset_Schema(ma.Schema):

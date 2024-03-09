@@ -13,8 +13,8 @@ class OwnedAsset(db.Model):
     portfolioID = db.Column(db.Integer, db.ForeignKey("portfolios.portfolioID"), nullable=False)
 
     # Relationship of table setup
-    asset = db.relationship("Asset", back_populates="ownedasset")
-    portfolio = db.relationship("Portfolio", back_populates="ownedasset")
+    asset = db.relationship("Asset", back_populates="ownedAssets")
+    portfolio = db.relationship("Portfolio", back_populates="ownedAssets")
 
 
 class OwnedAssetSchema(ma.Schema):
