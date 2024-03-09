@@ -1,4 +1,4 @@
-from init import db
+from init import db, ma
 
 class Transaction(db.Model):
     __tablename__ = "transactions"
@@ -14,3 +14,13 @@ class Transaction(db.Model):
 
     portfolio = db.relationship("Portfolio", back_populates="transaction")
     asset = db.relationship("Asset", back_populates="transaction")
+
+
+class Transaction_Scehma(ma.Schema):
+
+    class Meta:
+
+        fields = ("transactionID", "transactionType", "quantity", "price", "date", "portfolioID", "assetID")
+
+transaction_schema = Transaction_Scehma()
+transactions_schema = Transaction_Scehma(many=True)

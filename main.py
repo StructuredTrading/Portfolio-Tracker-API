@@ -33,4 +33,7 @@ def create_app():
     from controllers.ownedAssets_controller import ownedAssets_bp
     app.register_blueprint(ownedAssets_bp)
 
+    from controllers.transactions_controller import transactions_bp
+    app.register_blueprint(transactions_bp)
+
     return app

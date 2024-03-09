@@ -26,7 +26,7 @@ class PortfolioSchema(ma.Schema):
     ownedAssets = fields.List(fields.Nested("OwnedAssetSchema"))
 
     class Meta:
-        fields = ("portfolioID", "name", "description", "holdings", "date", "ownedAssets")#, "user")#, "transaction", "ownedasset")
+        fields = ("portfolioID", "name", "description", "holdings", "date", "ownedAssets")
         ordered=True
 
 portfolio_schema = PortfolioSchema()
