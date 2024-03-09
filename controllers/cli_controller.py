@@ -50,17 +50,23 @@ def seed_tables():
             print("trying to fetch assets")
             assets = []
             # Extract symbol, name, and price in USD for each cryptocurrency
-            unique_coins = ['dYdX']
+            unique_coins = []
             for coin in coins_market:
-                if 'dydx' not in coin['id'].lower():
+                # if 'dydx' not in coin['id'].lower():
+                if coin not in unique_coins:
                     unique_coins.append(coin['id'])
                     assets.append(
-                        {
-                            "id": coin['id'],
-                            "symbol": coin['symbol'].upper(),
-                            "name": coin['name'],
-                            "price": coin['current_price']
-                        } 
+                        Asset(
+                            assetID= coin['id'],
+                            marketCapPos= coin['market_cap_rank'],
+                            symbol= coin['symbol'].upper(),
+                            name= coin['name'],
+                            price= coin['current_price']
+                            # "id": coin['id'],
+                            # "symbol": coin['symbol'].upper(),
+                            # "name": coin['name'],
+                            # "price": coin['current_price']
+                        ) 
                     )
                 else:
                     print(f"Coin id '{coin['id']}' allready added.") 
@@ -71,19 +77,19 @@ def seed_tables():
             return jsonify({"error": str(e)}), 501
 
 
-    assets = []
-    available_assets = get_all_assets()
+    assets = get_all_assets()
+    # available_assets = get_all_assets()
 
-    for current_asset in available_assets:
-        # print(current_asset)
-        assets.append(
-            Asset(
-                assetID=current_asset["id"],
-                symbol=current_asset["symbol"],
-                name=current_asset["name"],
-                price=current_asset["price"]
-            )
-        )
+    # for current_asset in available_assets:
+    #     # print(current_asset)
+    #     assets.append(
+    #         Asset(
+    #             assetID=current_asset["id"],
+    #             symbol=current_asset["symbol"],
+    #             name=current_asset["name"],
+    #             price=current_asset["price"]
+    #         )
+    #     )
     
     db.session.add_all(assets)
     print("Seeding assets table.")
