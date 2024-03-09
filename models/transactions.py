@@ -16,11 +16,11 @@ class Transaction(db.Model):
     asset = db.relationship("Asset", back_populates="transaction")
 
 
-class Transaction_Scehma(ma.Schema):
+class Transaction_Schema(ma.Schema):
 
     class Meta:
 
-        fields = ("transactionID", "transactionType", "quantity", "price", "date", "portfolioID", "assetID")
+        fields = ("transactionID", "transactionType", "quantity", "price", "date")#, "portfolioID", "assetID")
 
-transaction_schema = Transaction_Scehma()
-transactions_schema = Transaction_Scehma(many=True)
+transaction_schema = Transaction_Schema()
+transactions_schema = Transaction_Schema(many=True)
