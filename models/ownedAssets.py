@@ -1,4 +1,4 @@
-from init import db
+from init import db, ma
 
 class OwnedAsset(db.Model):
     __tablename__ = "ownedAssets"
@@ -13,5 +13,14 @@ class OwnedAsset(db.Model):
     portfolioID = db.Column(db.Integer, db.ForeignKey("portfolios.portfolioID"), nullable=False)
 
     # Relationship of table setup
-    asset = db.relationship("Asset", back_populates="ownedasset")
-    portfolio = db.relationship("Portfolio", back_populates="ownedasset")
+    asset = db.relationship("Asset", back_populates="ownedAssets")
+    portfolio = db.relationship("Portfolio", back_populates="ownedAssets")
+
+
+class OwnedAssetSchema(ma.Schema):
+
+    class Meta:
+        fields = ('ID', 'symbol', 'name', 'quantity', 'price', 'totalCost', 'assetID', 'portfolioID')
+
+ownedAsset_schema = OwnedAssetSchema()
+ownedAssets_schema = OwnedAssetSchema(many=True)

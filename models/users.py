@@ -10,10 +10,10 @@ class User(db.Model):
 
     portfolio = db.relationship("Portfolio", back_populates="user", cascade="all, delete")
 
-# class UserSchema(ma.Schema):
+class UserSchema(ma.Schema):
 
-#     class Meta:
-#         fields = ("userID", "email", "password")
+    class Meta:
+        fields = ("userID", "email", "password")
 
-# user_schema = UserSchema()
-# users_schema = UserSchema(many=True)
+user_schema = UserSchema()
+users_schema = UserSchema(many=True)

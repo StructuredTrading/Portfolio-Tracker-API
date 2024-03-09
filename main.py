@@ -21,4 +21,19 @@ def create_app():
     from controllers.cli_controller import db_commands
     app.register_blueprint(db_commands)
 
+    from controllers.auth_controller import auth_bp
+    app.register_blueprint(auth_bp)
+
+    from controllers.portfolios_controller import portfolios_bp
+    app.register_blueprint(portfolios_bp)
+
+    from controllers.assets_controller import assets_bp
+    app.register_blueprint(assets_bp)
+
+    from controllers.ownedAssets_controller import ownedAssets_bp
+    app.register_blueprint(ownedAssets_bp)
+
+    from controllers.transactions_controller import transactions_bp
+    app.register_blueprint(transactions_bp)
+
     return app

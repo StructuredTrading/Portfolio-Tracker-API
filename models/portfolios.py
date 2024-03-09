@@ -1,3 +1,5 @@
+from marshmallow import fields
+
 from init import db, ma 
 
 class Portfolio(db.Model):
@@ -15,4 +17,17 @@ class Portfolio(db.Model):
     # name of relational attribute = user | function used to define a relationship = db.relationship() | name of related class = "User" | "portfolio" = the relationship attribute in the related class 'User'
     user = db.relationship("User", back_populates="portfolio")
     transaction = db.relationship("Transaction", back_populates="portfolio", cascade="all, delete")
-    ownedasset = db.relationship("OwnedAsset", back_populates="portfolio", cascade="all, delete")
+    ownedAssets = db.relationship("OwnedAsset", back_populates="portfolio", cascade="all, delete")
+
+class PortfolioSchema(ma.Schema):
+
+    user = fields.Nested("UserSchema", only=["email"])
+
+    ownedAssets = fields.List(fields.Nested("OwnedAssetSchema"))
+
+    class Meta:
+        fields = ("portfolioID", "name", "description", "holdings", "date", "ownedAssets")
+        ordered=True
+
+portfolio_schema = PortfolioSchema()
+portfolios_schema = PortfolioSchema(many=True)

@@ -1,4 +1,5 @@
-from init import db
+# from sqlalchemy import Numeric
+from init import db, ma
 
 class Transaction(db.Model):
     __tablename__ = "transactions"
@@ -6,7 +7,10 @@ class Transaction(db.Model):
     transactionID = db.Column(db.Integer, primary_key=True)
     transactionType = db.Column(db.String(100), nullable=False, default="buy")
     quantity = db.Column(db.Integer, nullable=False)
+    # price = db.Column(Numeric(precision=18, scale=8), nullable=False)
     price = db.Column(db.Float, nullable=False)
+    totalCost = db.Column(db.Float, nullable=False)
+    # cost = db.Column(Numeric(precision=12, scale=2), nullable=False)
     date = db.Column(db.Date, nullable=False)
 
     portfolioID = db.Column(db.Integer, db.ForeignKey("portfolios.portfolioID"))
@@ -14,3 +18,14 @@ class Transaction(db.Model):
 
     portfolio = db.relationship("Portfolio", back_populates="transaction")
     asset = db.relationship("Asset", back_populates="transaction")
+
+
+
+class Transaction_Schema(ma.Schema):
+
+    class Meta:
+
+        fields = ("transactionID", "transactionType", "quantity", "price", "totalCost", "date", "portfolioID", "assetID")
+
+transaction_schema = Transaction_Schema()
+transactions_schema = Transaction_Schema(many=True)
