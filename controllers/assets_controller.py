@@ -31,7 +31,6 @@ def update_asset_prices():
             asset.marketCapPos = data.get('market_cap_rank', asset.marketCapPos)  # Update market cap position
     # Commit the updated prices to the database
     db.session.commit()
-   
     return
 
 

@@ -5,15 +5,36 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from init import db
 from models.portfolios import Portfolio, portfolio_schema, portfolios_schema
+from models.transactions import Transaction
+from models.ownedAssets import OwnedAsset
 
 
 portfolios_bp = Blueprint("portfolios", __name__, url_prefix="/portfolios")
+
+def refresh_portfolio():
+    stmt = db.select(Portfolio)
+    portfolios = db.session.scalars(stmt).all()
+    if portfolios:
+        for portfolio in portfolios:
+            stmt2 = db.select(Transaction).filter_by(portfolioID=portfolio.portfolioID)
+            stmt3 = db.select(OwnedAsset).filter_by(portfolioID=portfolio.portfolioID)
+            transactions = db.session.scalars(stmt2).all()
+            ownedAssets = db.session.scalars(stmt3).all()
+            print(f"owned Assets:{ownedAssets}")
+            total_cost = sum(transaction.totalCost for transaction in transactions)
+            if portfolio.holdings != total_cost:
+                portfolio.holdings=total_cost
+            # if portfolio.ownedAssets != ownedAssets:
+            # print(f"porfolio contains: {portfolio.ownedAssets}")
+            # print(f"portfolio doesnt contain {ownedAssets}")
+        db.session.commit()
 
 # Retrieve all portfolios from portfolios table in database
 @portfolios_bp.route("/") # /portfolios
 def get_all_portfolios():
     # SQL select statement to retrieve all entries from 'portfolios' table,
     # ordering them by 'portfolioID'
+    refresh_portfolio()
     stmt = db.select(Portfolio).order_by(Portfolio.portfolioID)
     # Execute SQL statement 'stmt' against database, and retrieve the result.
     portfolios = db.session.execute(stmt).scalars().all() 
@@ -24,6 +45,7 @@ def get_all_portfolios():
 @portfolios_bp.route("/search/<int:portfolio_id>", methods=["GET"]) #   /portfolios/search/<portfolio_id>
 @jwt_required()
 def search_for_portfolio(portfolio_id):
+    refresh_portfolio()
     # Retrieve boy data from JSON
         # SQL select statement to retrieve to retrieve portfolio entry in 'portfolios' table,
     # that matches 'portfolio_id'
@@ -43,7 +65,7 @@ def search_for_portfolio(portfolio_id):
 @portfolios_bp.route("/create", methods=["POST"]) # /portfolios/create
 @jwt_required()
 def create_portfolio():
-    # Retrieve body data from JSON
+    # Retrieve body data from JSON in portfolio_schema format
     data = portfolio_schema.load(request.get_json())
     # Create new portfolio model instance
     portfolio = Portfolio(

@@ -20,7 +20,7 @@ class OwnedAsset(db.Model):
 class OwnedAssetSchema(ma.Schema):
 
     class Meta:
-        fields = ('ID', 'symbol', 'name', 'quantity', 'price', 'assetID', 'portfolioID')
+        fields = ('ID', 'symbol', 'name', 'quantity', 'price', 'totalCost', 'assetID', 'portfolioID')
 
 ownedAsset_schema = OwnedAssetSchema()
 ownedAssets_schema = OwnedAssetSchema(many=True)

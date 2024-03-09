@@ -78,19 +78,6 @@ def seed_tables():
 
 
     assets = get_all_assets()
-    # available_assets = get_all_assets()
-
-    # for current_asset in available_assets:
-    #     # print(current_asset)
-    #     assets.append(
-    #         Asset(
-    #             assetID=current_asset["id"],
-    #             symbol=current_asset["symbol"],
-    #             name=current_asset["name"],
-    #             price=current_asset["price"]
-    #         )
-    #     )
-    
     db.session.add_all(assets)
     print("Seeding assets table.")
 
@@ -114,6 +101,7 @@ def seed_tables():
             transactionType="buy",
             quantity=10,
             price=assets[0].price,
+            totalCost=round(assets[0].price * 10, 2),
             date=date.today(),
             # assetID=assets[0],
             asset=assets[0],
@@ -124,6 +112,7 @@ def seed_tables():
             transactionType="buy",
             quantity=5,
             price=assets[1].price,
+            totalCost=round(assets[1].price * 5, 2),
             date=date.today(),
             asset=assets[1],
             portfolio=portfolios[0]
@@ -132,6 +121,7 @@ def seed_tables():
             transactionType="buy",
             quantity=30,
             price=assets[21].price,
+            totalCost=round(assets[21].price * 30, 2),
             date=date.today(),
             asset=assets[21],
             portfolio=portfolios[0]
@@ -140,14 +130,15 @@ def seed_tables():
             transactionType="buy",
             quantity=1000,
             price=assets[9].price,
+            totalCost=round(assets[9].price * 1000, 2),
             date=date.today(),
             asset=assets[9],
             portfolio=portfolios[0]
         )
     ]
 
-    # adjusting portfolio holdings according to transactions
-    portfolios[0].holdings=transactions[0].quantity * transactions[0].price + transactions[1].quantity * transactions[1].price + transactions[2].quantity * transactions[2].price + transactions[3].quantity * transactions[3].price
+    # adjusting portfolio holdings according to transactions manually (Only for seeding)
+    portfolios[0].holdings=transactions[0].totalCost + transactions[1].totalCost + transactions[2].totalCost + transactions[3].totalCost
 
     db.session.add_all(portfolios)
     print("Seeding portfolios table.")
