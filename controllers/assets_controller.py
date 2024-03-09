@@ -17,7 +17,7 @@ def update_asset_prices():
 
     # # Fetch current prices for all assets in one go, replace 'usd'
 
-    # Use /coins/markets endpoint to fetch market data including market cap rank
+    # Fetch updated market data against 'usd' currency
     market_data = cg.get_coins_markets(vs_currency='usd', ids=','.join(asset_ids))
 
     # Create a dictionary mapping CoinGecko IDs to their market data for easier access
@@ -29,12 +29,10 @@ def update_asset_prices():
         if data:
             asset.price = data.get('current_price', asset.price)  # Update price
             asset.marketCapPos = data.get('market_cap_rank', asset.marketCapPos)  # Update market cap position
-            # asset.price = prices.get(asset.assetID, {}).get('usd', asset.price)
-            # asset.marketCapPos = prices.get('market_cap_rank') 
     # Commit the updated prices to the database
     db.session.commit()
    
-    return assets_schema.dump(assets) #jsonify(updated_assets_info)
+    return
 
 
 # Retrieve all available assets
@@ -42,7 +40,7 @@ def update_asset_prices():
 def retrieve_all_assets():
     # Update asset prices and marketCapPos before retrieving
     update_asset_prices()
-    # Retrieve all assets from the database
+    # Retrieve all newly updated assets from the database
     stmt = db.select(Asset).order_by(Asset.marketCapPos)
     assets = db.session.execute(stmt).scalars().all() 
     return assets_schema.dump(assets)

@@ -23,8 +23,10 @@ class PortfolioSchema(ma.Schema):
 
     user = fields.Nested("UserSchema", only=["email"])
 
+    ownedasset = fields.List(fields.Nested("OwnedAssetSchema"))
+
     class Meta:
-        fields = ("portfolioID", "name", "description", "holdings", "date")#, "user")#, "transaction", "ownedasset")
+        fields = ("portfolioID", "name", "description", "holdings", "date", "ownedasset")#, "user")#, "transaction", "ownedasset")
         ordered=True
 
 portfolio_schema = PortfolioSchema()
