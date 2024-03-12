@@ -7,6 +7,7 @@ from init import db
 from models.portfolios import Portfolio, portfolio_schema, portfolios_schema
 from models.transactions import Transaction
 from models.ownedAssets import OwnedAsset
+from controllers.auth_controller import authorise_as_admin
 
 
 portfolios_bp = Blueprint("portfolios", __name__, url_prefix="/portfolios")
@@ -31,6 +32,8 @@ def refresh_portfolio():
 
 # Retrieve all portfolios from portfolios table in database
 @portfolios_bp.route("/") # /portfolios
+@jwt_required()
+@authorise_as_admin(custom_error_message="Only user Admin can retrieve all available portfolio's. Try using '/portfolios/search/<portfolio_id>' to search.")
 def get_all_portfolios():
     # SQL select statement to retrieve all entries from 'portfolios' table,
     # ordering them by 'portfolioID'
@@ -65,6 +68,10 @@ def search_for_portfolio(portfolio_id):
 @portfolios_bp.route("/create", methods=["POST"]) # /portfolios/create
 @jwt_required()
 def create_portfolio():
+    stmt = db.select(Portfolio).filter_by(userID=get_jwt_identity())
+    existing_portfolio = db.session.scalar(stmt)
+    if existing_portfolio:
+        return {"error": f"User '{existing_portfolio.userID}' allready has a portfolio called '{existing_portfolio.name}'."}
     # Retrieve body data from JSON in portfolio_schema format
     data = portfolio_schema.load(request.get_json())
     # Create new portfolio model instance

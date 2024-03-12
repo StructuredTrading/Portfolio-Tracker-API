@@ -8,7 +8,7 @@ class User(db.Model):
     password = db.Column(db.String, nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
 
-    portfolio = db.relationship("Portfolio", back_populates="user", cascade="all, delete")
+    portfolio = db.relationship("Portfolio", back_populates="user", uselist=False, cascade="all, delete")
 
 class UserSchema(ma.Schema):
 

@@ -11,7 +11,7 @@ class Portfolio(db.Model):
     holdings = db.Column(db.Float, default=0, nullable=False)
     date = db.Column(db.Date, nullable=False) # Date the portfolio was created.
 
-    userID = db.Column(db.Integer, db.ForeignKey("users.userID"), nullable=False) # Foreign key 'user.UserID' tablename = 'user', key = 'UserID'
+    userID = db.Column(db.Integer, db.ForeignKey("users.userID"), unique=True, nullable=False) # Foreign key 'user.UserID' tablename = 'user', key = 'UserID'
 
     # Relationship of tables setup 
     # name of relational attribute = user | function used to define a relationship = db.relationship() | name of related class = "User" | "portfolio" = the relationship attribute in the related class 'User'

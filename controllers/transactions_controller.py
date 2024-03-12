@@ -80,12 +80,12 @@ def create_trade():
             totalCost=asset.price * int(data.get("quantity")),
             date=date.today(),
             assetID=data.get("assetID"),
-            portfolioID=get_jwt_identity()
+            portfolioID=get_jwt_identity() # this will get the user identity NOT the portfolio identity
         )
         db.session.add(new_transaction)
         db.session.commit()
         update_owned_assets(new_transaction)
-        return {"message": "Asset found."}
+        return transaction_schema.dump(new_transaction)#{"message": "Asset found."}
 
     else:
         return {"error": "Asset id not found."}
