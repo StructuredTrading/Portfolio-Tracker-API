@@ -1,4 +1,5 @@
 from init import db,ma
+from marshmallow import fields, validate
 
 class User(db.Model):
     __tablename__ = "users"
@@ -14,6 +15,8 @@ class UserSchema(ma.Schema):
 
     class Meta:
         fields = ("userID", "email", "password")
+    email = fields.Email()
+    password = ma.String(validate=validate.Length(min=6))
 
 user_schema = UserSchema()
 users_schema = UserSchema(many=True)

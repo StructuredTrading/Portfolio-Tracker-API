@@ -9,6 +9,7 @@ from models.assets import Asset
 from models.ownedAssets import OwnedAsset
 from models.portfolios import Portfolio
 from controllers.assets_controller import update_asset_prices
+# from controllers.auth_controller import authorised_user
 
 
 transactions_bp = Blueprint("transactions", __name__, url_prefix="/transactions")
@@ -65,33 +66,32 @@ def search_transactions_by_id(transaction_id):
 @transactions_bp.route("/trade", methods=["POST"])
 @jwt_required()
 def create_trade():
-    # Retrieve data from json body
-    data = transaction_schema.load(request.get_json())
-    # Attempt to retrieve asset from list of assets
-    stmt = db.select(Asset).filter_by(assetID=data.get("assetID"))
-    asset = db.session.scalar(stmt)
-    # assets = db.session.execute(stmt).scalars().all()
-    if asset:
-        update_asset_prices()
-        new_transaction = Transaction(
-            transactionType=data.get("transactionType"),
-            quantity=data.get("quantity"),
-            price=asset.price,
-            totalCost=asset.price * int(data.get("quantity")),
-            date=date.today(),
-            assetID=data.get("assetID"),
-            portfolioID=get_jwt_identity() # this will get the user identity NOT the portfolio identity
-        )
-        db.session.add(new_transaction)
-        db.session.commit()
-        update_owned_assets(new_transaction)
-        return transaction_schema.dump(new_transaction)#{"message": "Asset found."}
+    current_user = get_jwt_identity()
+    stmt = db.select(Portfolio).filter_by(userID=current_user)
+    portfolio = db.session.scalar(stmt)
+    # If currently logged in user has a portfolio
+    if portfolio:
+        # Retrieve data from json body
+        data = transaction_schema.load(request.get_json())
+        # Attempt to retrieve asset from list of assets
+        stmt = db.select(Asset).filter_by(assetID=data.get("assetID"))
+        asset = db.session.scalar(stmt)
+        # assets = db.session.execute(stmt).scalars().all()
+        if asset:
+            update_asset_prices()
+            new_transaction = Transaction(
+                transactionType=data.get("transactionType"),
+                quantity=data.get("quantity"),
+                price=asset.price,
+                totalCost=asset.price * int(data.get("quantity")),
+                date=date.today(),
+                assetID=data.get("assetID"),
+                portfolioID=portfolio.portfolioID # this will get the user identity NOT the portfolio identity
+            )
+            db.session.add(new_transaction)
+            db.session.commit()
+            update_owned_assets(new_transaction)
+            return transaction_schema.dump(new_transaction)#{"message": "Asset found."}
 
-    else:
-        return {"error": "Asset id not found."}
-
-    
-    # Currently retrieving all assets and then checking if assetID in json is inside assets table.
-    # However i could simply attempt to retrieve just that single asset from the table using assetID and if the asset
-    # exists i could continue else return no asset found ec
-    # if data.get("assetID") in assets_ids:
+        else:
+            return {"error": "Asset id not found."}
