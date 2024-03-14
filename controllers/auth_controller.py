@@ -120,22 +120,48 @@ def auth_login():
 # Delete a user
 @auth_bp.route("/delete/<int:user_id>", methods=["DELETE"])
 @jwt_required()
-# @authorised_user()
 def delete_user(user_id):
+    """
+    Endpoint: DELETE /auth/delete/<int:user_id>
+    Functionality: This endpoint handles the deletion of a user record from the database. It checks if the user making the request has the right authorization to delete the specified user account. The endpoint requires JWT authentication, and the user must be the account owner or an admin to proceed with deletion. Upon successful deletion, it returns a confirmation message.
+
+    Input: User ID as part of the URL path.
+    Output: JSON object with a message indicating successful deletion, and HTTP status code 200 (OK).
+    Errors: 
+    - Returns a 401 Unauthorized error message and status code if the user is not the account owner or an admin.
+    - Returns a 404 Not Found error message and status code if the user account does not exist.
+
+    Requires:
+    - JWT token in the Authorization header to authenticate the request.
+    - `user_id` parameter in the URL path specifying the user account to be deleted.
+    """
+    # Get the current user's ID from the JWT token
     current_user_id = get_jwt_identity()
+
+    # Fetch the current user's record from the database
     current_user = User.query.get(current_user_id)
 
+    # Prepare a statement to find the user to delete by their user ID
     stmt = db.select(User).filter_by(userID=user_id)
     user_to_delete = db.session.scalar(stmt)
 
-    # If user to delete exists
+    # If the user to delete is found in the database
     if user_to_delete:
-        # Check if the current user is the user to be deleted OR if the current user is an admin
+
+        # Check if the current user is either the user to be deleted or an admin
         if (str(user_to_delete.userID) == current_user_id) or (current_user.is_admin):
+
+            # Delete the user record from the database and commit the changes
             db.session.delete(user_to_delete)
             db.session.commit()
+
+            # Return a success message
             return {"message": f"User with userID '{user_to_delete.userID}' successfully deleted."}, 200
+        
+        # Return an error if the current user is neither the user to be deleted nor an admin
         else:
-            return {"error": "Unauthorized. You do not have permission to perform this action."}, 403
+            return {"error": "Unauthorized. You do not have permission to perform this action."}, 401
+    
+    # Return an error if the user to be deleted was not found
     else:
         return {"error": f"User with 'userID' '{user_id}' does not exist."}, 404
