@@ -4,6 +4,7 @@ from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from init import db
+from models.users import User
 from models.portfolios import Portfolio, portfolio_schema, portfolios_schema
 from models.transactions import Transaction
 from models.ownedAssets import OwnedAsset
@@ -33,7 +34,7 @@ def refresh_portfolio():
 # Retrieve all portfolios from portfolios table in database
 @portfolios_bp.route("/") # /portfolios
 @jwt_required()
-@authorise_as_admin(custom_error_message="Only user Admin can retrieve all available portfolio's. Try using '/portfolios/search/<portfolio_id>' to search.")
+@authorise_as_admin()
 def get_all_portfolios():
     # SQL select statement to retrieve all entries from 'portfolios' table,
     # ordering them by 'portfolioID'
@@ -54,10 +55,11 @@ def search_for_portfolio(portfolio_id):
     # that matches 'portfolio_id'
     stmt = db.select(Portfolio).filter_by(portfolioID=portfolio_id)
     portfolio = db.session.scalar(stmt)
+    current_user = get_jwt_identity()
     # If portfolio exists
     if portfolio:
-        if str(portfolio.userID) != get_jwt_identity():
-            return {"error": "Only the owner can retrieve this portfolio"}, 403
+        if str(portfolio.userID) != current_user or current_user.is_admin:
+            return {"error": "Not authorised to perform this action"}, 401
         # Return portfolio
         return portfolio_schema.dump(portfolio)
     else:
@@ -71,7 +73,7 @@ def create_portfolio():
     stmt = db.select(Portfolio).filter_by(userID=get_jwt_identity())
     existing_portfolio = db.session.scalar(stmt)
     if existing_portfolio:
-        return {"error": f"User '{existing_portfolio.userID}' allready has a portfolio called '{existing_portfolio.name}'."}
+        return {"error": f"User '{existing_portfolio.userID}' is not allowed to create more than one portfolio, user '{existing_portfolio.userID}' allready has a portfolio called '{existing_portfolio.name}'."}, 403
     # Retrieve body data from JSON in portfolio_schema format
     data = portfolio_schema.load(request.get_json())
     # Create new portfolio model instance
@@ -97,10 +99,13 @@ def update_portfolio(portfolio_id):
     # Retrieve the portfolio from database whose fields need to be updated
     stmt = db.select(Portfolio).filter_by(portfolioID=portfolio_id)
     portfolio = db.session.scalar(stmt)
+    current_user = User.query.filter_by(userID=get_jwt_identity()).first()
     # If portfolio exists
     if portfolio:
-        if str(portfolio.userID) != get_jwt_identity():
-            return {"error": "Only the owner can edit this portfolio"}, 403
+        # If current user does not own the portfolio and is not an admin
+        if portfolio.userID != current_user.userID and not current_user.is_admin:
+            # Return error response
+            return {"error": "Only the portfolio owner or an admin can edit the requested portfolio"}, 403
         # Update the fields
         portfolio.name=data.get("name") or portfolio.name,
         portfolio.description=data.get("description") or portfolio.description
@@ -118,14 +123,25 @@ def update_portfolio(portfolio_id):
 @portfolios_bp.route("/delete/<int:portfolio_id>", methods=["DELETE"]) #    /portfolios/delete/<portfolio_id>
 @jwt_required()
 def delete_portfolio(portfolio_id):
+    # Retrieve the portfolio to be deleted
     stmt = db.select(Portfolio).filter_by(portfolioID=portfolio_id)
     portfolio = db.session.scalar(stmt)
+    # Retrieve the currently logged in user
+    current_user = User.query.filter_by(userID=get_jwt_identity()).first()
+    # If portfolio exists
     if portfolio:
-        if str(portfolio.userID) != get_jwt_identity():
-            return {"error": f"Only the owner can delete the portfolio '{portfolio.name}' portfolio"}, 403
+        # If current user does not own the portfolio and is not an admin
+        if (portfolio.userID != current_user.userID and not current_user.is_admin):
+            # Return error response
+            return {"error": "Only the portfolio owner or an admin can delete the requested portfolio"}, 403
+        # Else if current user owns the portfolio or is an admin
         else:
+            # Delete portfolio, save changes to database
             db.session.delete(portfolio)
             db.session.commit()
+            # Return success response
             return {"message": f"Portfolio '{portfolio.name}' with portfolio ID '{portfolio.portfolioID}' has successfully been deleted."}, 200
+    # Else if portfolio does not exist
     else:
+        # Return error response
         return {"error": f"Portfolio with ID '{portfolio_id}' not found."}, 404

@@ -24,7 +24,7 @@ def create_app():
     # global error handling
     @app.errorhandler(ValidationError)
     def validation_error(err):
-        return {"error": "Not"}, 400
+        return {"error": str(err)}, 400
     
     @app.errorhandler(404)
     def not_found(err):
