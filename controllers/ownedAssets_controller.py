@@ -5,15 +5,44 @@ from init import db
 from models.ownedAssets import OwnedAsset, ownedAssets_schema
 from models.portfolios import Portfolio
 from models.users import User
+from controllers.auth_controller import authorise_as_admin
 
 ownedAssets_bp = Blueprint("ownedAssets", __name__, url_prefix="/assets/owned")
 
 
 @ownedAssets_bp.route("/")
+@authorise_as_admin()
 def retrieve_owned_assets():
+    """
+    Endpoint: GET /assets/owned
+
+    Functionality: Retrieves a comprehensive list of all owned assets across every portfolio in the database, exclusively accessible to administrators. This endpoint provides a detailed overview of assets, including symbol, name, quantity, and price, aiding in the administrative monitoring and analysis of asset distribution within the system.
+
+    Input: None required. The endpoint does not need any input parameters to function.
+
+    Output: Provides a JSON array comprising detailed information on all owned assets within the system if available.
+
+    Errors:
+    - Returns a 403 Forbidden status code if the requester lacks administrative privileges.
+    - Returns a 404 Not Found status code if no assets are found within the database.
+    - Encounters during database operations or data serialization are addressed by the application's global error handling mechanisms.
+
+    Requirements:
+    - A valid JWT token is necessary to validate the requester's administrative status, ensuring that the sensitive data remains secure and is only accessible to authorized personnel.
+    """
+
+    # Execute query to retrieve all owned assets from the database
     stmt = db.select(OwnedAsset)
     assets = db.session.execute(stmt).scalars().all()
-    return ownedAssets_schema.dump(assets)
+    # If assets exist
+    if assets:
+        # Serialize and return the retrieved assets as JSON
+        return ownedAssets_schema.dump(assets), 200
+    # Else if assets do not exist
+    else:
+        # Return error response
+        return {"error": "No assets found"}, 404
+
 
 @ownedAssets_bp.route("/<int:portfolio_id>")
 @jwt_required()

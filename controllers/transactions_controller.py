@@ -10,7 +10,7 @@ from models.ownedAssets import OwnedAsset
 from models.portfolios import Portfolio
 from models.users import User
 from controllers.assets_controller import update_asset_prices
-# from controllers.auth_controller import authorised_user
+from controllers.auth_controller import authorise_as_admin
 
 
 transactions_bp = Blueprint("transactions", __name__, url_prefix="/transactions")
@@ -30,7 +30,7 @@ def update_owned_assets(transaction):
     # Retrieve ownedAsset instance that matches asset in transaction and portfolioID
     stmt = db.select(OwnedAsset).filter_by(portfolioID=transaction.portfolioID).filter_by(assetID=transaction.assetID)
     ownedAsset = db.session.scalar(stmt)
-    
+
     # If ownedAsset exists, update the new quantity and AvgPrice
     if ownedAsset:
         new_quantity = ownedAsset.quantity + transaction.quantity
@@ -62,10 +62,36 @@ def update_owned_assets(transaction):
 
 
 @transactions_bp.route("/")
+@authorise_as_admin()
 def retrieve_all_transactions():
+    """
+    Endpoint: GET /transactions
+
+    Functionality: Retrieves a comprehensive list of all transactions across all portfolios, accessible exclusively to users with administrative privileges. This endpoint offers a detailed overview of transaction activities, including transaction types, quantities, prices, and associations with specific assets and portfolios.
+
+    Input: None. No input parameters are required for this request.
+    Output: A JSON array containing the details of all transactions, provided transactions exist within the database.
+
+    Errors:
+    - Returns a 403 Forbidden error if the requester does not have administrative privileges, ensuring sensitive transaction data is safeguarded.
+    - Returns a 404 Not Found error if no transactions are present within the database.
+
+    Requires:
+    - A valid JWT token in the Authorization header to authenticate the request, ensuring that the requester possesses administrative privileges. The @authorise_as_admin() decorator enforces this requirement, restricting access to this sensitive endpoint to authorized administrative users only.
+    """
+
+    # Execute query to retrieve all transactions from the database
     stmt = db.select(Transaction)
     transactions = db.session.execute(stmt).scalars().all()
-    return transactions_schema.dump(transactions)
+
+    # If transactions are found in the database
+    if transactions:
+        # Serialize and return the list of transactions as JSON
+        return transactions_schema.dump(transactions), 200
+    # If no transactions are found
+    else:
+        # Return an error message indicating no transactions were found
+        return  {"error": "No transactions found"}, 404
 
 
 @transactions_bp.route("/search/<int:transaction_id>")

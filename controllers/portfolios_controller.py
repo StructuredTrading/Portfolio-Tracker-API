@@ -107,7 +107,7 @@ def search_for_portfolio(portfolio_id):
     Functionality: Retrieves the details of a specific portfolio identified by portfolio_id. This endpoint requires JWT authentication and ensures that only the portfolio's owner or an administrative user can access the portfolio details, maintaining privacy and security.
 
     Input: Portfolio ID as part of the URL path.
-    Output: JSON object containing the details of the requested portfolio.
+    Output: JSON object containing the details of the requested portfolio with 200 success response.
     
     Errors: 
     - Returns a 403 Forbidden error message and status code if the requester is neither the owner of the portfolio nor an admin, indicating unauthorized access attempt.
@@ -137,7 +137,7 @@ def search_for_portfolio(portfolio_id):
         # Else if user owns portfolio or is an admin
         else:
             # Return portfolio
-            return portfolio_schema.dump(portfolio)
+            return portfolio_schema.dump(portfolio), 200
     # Else if portfolio does not exists
     else:
         # Return error response

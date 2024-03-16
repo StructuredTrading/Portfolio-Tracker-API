@@ -8,6 +8,7 @@ from models.portfolios import Portfolio
 from models.assets import Asset
 from models.ownedAssets import OwnedAsset
 from models.transactions import Transaction
+from controllers.assets_controller import get_all_assets
 
 
 db_commands = Blueprint('db', __name__)
@@ -41,40 +42,6 @@ def seed_tables():
 
     db.session.add_all(users)
     print("Seeding users table.")
-
-    def get_all_assets():
-        try:
-            # Fetch market data for cryptocurrencies in USD
-            # The 'vs_currency' is set to 'usd', and you could adjust the 'per_page' and 'page' parameters as needed
-            coins_market = cg.get_coins_markets(vs_currency='usd', per_page=250, page=1)
-            print("trying to fetch assets")
-            assets = []
-            # Extract symbol, name, and price in USD for each cryptocurrency
-            unique_coins = []
-            for coin in coins_market:
-                # if 'dydx' not in coin['id'].lower():
-                if coin not in unique_coins:
-                    unique_coins.append(coin['id'])
-                    assets.append(
-                        Asset(
-                            assetID= coin['id'],
-                            marketCapPos= coin['market_cap_rank'],
-                            symbol= coin['symbol'].upper(),
-                            name= coin['name'],
-                            price= coin['current_price']
-                            # "id": coin['id'],
-                            # "symbol": coin['symbol'].upper(),
-                            # "name": coin['name'],
-                            # "price": coin['current_price']
-                        ) 
-                    )
-                else:
-                    print(f"Coin id '{coin['id']}' allready added.") 
-            
-            return assets
-        
-        except Exception as e:
-            return jsonify({"error": str(e)}), 501
 
 
     assets = get_all_assets()

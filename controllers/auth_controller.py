@@ -11,49 +11,49 @@ from models.users import User, user_schema
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 def authorise_as_admin(custom_error_message=None):
+    """
+    Decorator: authorise_as_admin
+
+    Functionality: This decorator is used to restrict access to certain endpoints to only users with administrative privileges. It checks the role of the user making the request and allows the request to proceed if the user is an admin. Otherwise, it returns an error response.
+
+    Input: Optionally takes a custom error message to be returned if the user is not authorized.
+    Output: The decorated function's output if the user is an admin, or a JSON error message and HTTP status code 403 (Forbidden) if not.
+
+    Errors:
+    - Returns a 403 Forbidden error message and status code if the user attempting to access the function is not an admin. The error message can be customized.
+
+    Requires:
+    - A valid JWT token in the Authorization header to authenticate the request and verify the user's identity and administrative status.
+    """
+
     def decorator(fn):
+        """
+        Decorator function that checks if the currently logged-in user has administrative privileges.
+        
+        :param custom_error_message: Optional string parameter for specifying a custom error message.
+        """
+
         @functools.wraps(fn)
         def wrapper(*args, **kwargs):
+            # Retrieve the currently logged-in user's ID from JWT token
             current_user = get_jwt_identity()
+             # Query the database for the user with the retrieved ID
             stmt = db.select(User).filter_by(userID=current_user)
             user = db.session.scalar(stmt)
-            # If the user is an admin
-            if user.is_admin:
-                # We will continue and run the decorated function
+            # Check if the user is marked as an admin
+            if user and user.is_admin:
+                # Allow the request to proceed and execute the decorated function
                 return fn(*args, **kwargs)
             # else (if the user is NOT an admin)
             else:
-                # set the error_message to be returned
+                # User is not an admin, prepare custom or default error message
                 error_message = custom_error_message or "Not authorised to perform this action"
-                # return an error
+                # Return an error response indicating the user is not authorized
                 return {"error": error_message}, 403
         return wrapper
     return decorator
 
 
-# def authorised_user(custom_error_message=None):
-#     def decorator(fn):
-#         @functools.wraps(fn)
-#         def wrapper(*args, **kwargs):
-#             data = request.get_json()
-#             current_user = get_jwt_identity()
-#             stmt = db.select(User).filter_by(userID=current_user)
-#             user = db.session.scalar(stmt)
-#             # If the currently logged in user is the same user as the user_id in the API call
-#             if user.userID == data.get("userID"):
-#                 # We will continue and run the decorated function
-#                 return fn (*args, **kwargs)
-#             # else (if the user is not the same user as being requested in the API call)
-#             else:
-#                 # set the error_message to be returned
-#                 error_message = custom_error_message or "Not authorised to perform this action"
-#                 # return an error
-#                 return {"error": error_message}, 403
-#         return wrapper
-#     return decorator
-
-
-# 
 @auth_bp.route("/register", methods=["POST"])
 def auth_register():
     """
