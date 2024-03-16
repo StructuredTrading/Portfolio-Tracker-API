@@ -8,16 +8,25 @@ assets_bp = Blueprint("assets", __name__, url_prefix="/assets")
  
 
 def get_all_assets():
+        """
+        Functionality: Fetches and returns a list of cryptocurrency assets with their market data including symbol, name, and current price in USD. This function makes an external API call to CoinGecko to retrieve the market data for up to 250 cryptocurrencies, ensuring a comprehensive dataset is obtained.
+
+        Input: None. This function does not require any input parameters as it retrieves data based on predefined settings such as 'vs_currency' set to 'usd'.
+
+        Output: A list of Asset instances, each populated with the 'assetID', 'marketCapPos', 'symbol', 'name', and 'price' of a cryptocurrency. These Asset instances are ready to be processed further, such as being added to a database.
+
+        Errors:
+        - Returns a JSON object with an error message and HTTP status code 501 (Not Implemented) if an exception occurs during the fetch process, indicating a problem with the external API call or data processing.
+        """
         try:
             # Fetch market data for cryptocurrencies in USD
-            # The 'vs_currency' is set to 'usd', and you could adjust the 'per_page' and 'page' parameters as needed
             coins_market = cg.get_coins_markets(vs_currency='usd', per_page=250, page=1)
             print("trying to fetch assets")
             assets = []
             # Extract symbol, name, and price in USD for each cryptocurrency
-            unique_coins = []
+            unique_coins = []  # Use a set to track unique coin IDs
             for coin in coins_market:
-                # if 'dydx' not in coin['id'].lower():
+                # Check if coin ID is already processed to ensure uniqueness
                 if coin not in unique_coins:
                     unique_coins.append(coin['id'])
                     assets.append(
@@ -33,8 +42,8 @@ def get_all_assets():
                     print(f"Coin id '{coin['id']}' allready added.") 
             
             return assets
-        
         except Exception as e:
+            # Handle exceptions by returning an error message and a 501 status code
             return jsonify({"error": str(e)}), 501
         
 
