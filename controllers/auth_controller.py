@@ -58,12 +58,14 @@ def authorise_as_admin(custom_error_message=None):
 def auth_register():
     """
     Endpoint: POST /auth/register
+
     Functionality: This endpoint handles user registration. It validates the input data,
     hashes the user's password for security, and creates a new user record in the database.
     Upon successful registration, it returns the newly created user data.
     
     Input: JSON object containing 'email' and 'password'.
     Output: JSON object of the registered user excluding the password, and HTTP status code 201 (Created).
+
     Errors: Returns appropriate error messages and HTTP status codes for invalid inputs or failed operations.
     """
     # Validate and deserialize json input
@@ -79,7 +81,6 @@ def auth_register():
         )
     db.session.add(user)
     db.session.commit()
-
     # Return the created user
     return user_schema.dump(user), 201
 
@@ -89,13 +90,16 @@ def auth_register():
 def auth_login():
     """
     Endpoint: POST /auth/login
+
     Functionality: This endpoint handles the login process for registered users. It validates the input data against the user schema,
     checks for a user with the matching email, and verifies the password. Upon successful authentication,
     it generates a JWT access token with a specified expiration time and returns the user's email, access token,
     and admin status. If the email or password does not match, it returns an error.
+
     Input: JSON object containing 'email' and 'password'.
     Output: On successful authentication, returns a JSON object with the user's email, a JWT access token, 
     and a boolean indicating whether the user is an admin, along with HTTP status code 200 (OK).
+
     Errors: Returns an error message and HTTP status code 401 (Unauthorized) for incorrect email or password.
     """
     # Validate and deserialize json input
@@ -107,11 +111,9 @@ def auth_login():
     
     # If email and password is correct
     if user and data.get("password") and bcrypt.check_password_hash(user.password, data.get("password")):
-
         # Create JWT access token and return login information
         token = create_access_token(identity=str(user.userID), expires_delta=timedelta(days=1))
         return {"email": user.email, "token": token, "is_admin": user.is_admin}, 200
-    
     # Else return error
     else:
         return {"error": "Invalid email or password"}, 401
@@ -123,10 +125,12 @@ def auth_login():
 def delete_user(user_id):
     """
     Endpoint: DELETE /auth/delete/<int:user_id>
+
     Functionality: This endpoint handles the deletion of a user record from the database. It checks if the user making the request has the right authorization to delete the specified user account. The endpoint requires JWT authentication, and the user must be the account owner or an admin to proceed with deletion. Upon successful deletion, it returns a confirmation message.
 
     Input: User ID as part of the URL path.
     Output: JSON object with a message indicating successful deletion, and HTTP status code 200 (OK).
+
     Errors: 
     - Returns a 401 Unauthorized error message and status code if the user is not the account owner or an admin.
     - Returns a 404 Not Found error message and status code if the user account does not exist.
@@ -147,21 +151,16 @@ def delete_user(user_id):
 
     # If the user to delete is found in the database
     if user_to_delete:
-
         # Check if the current user is either the user to be deleted or an admin
         if (str(user_to_delete.userID) == current_user_id) or (current_user.is_admin):
-
             # Delete the user record from the database and commit the changes
             db.session.delete(user_to_delete)
             db.session.commit()
-
             # Return a success message
             return {"message": f"User with userID '{user_to_delete.userID}' successfully deleted."}, 200
-        
         # Return an error if the current user is neither the user to be deleted nor an admin
         else:
             return {"error": "Unauthorized. You do not have permission to perform this action."}, 401
-    
     # Return an error if the user to be deleted was not found
     else:
         return {"error": f"User with 'userID' '{user_id}' does not exist."}, 404
