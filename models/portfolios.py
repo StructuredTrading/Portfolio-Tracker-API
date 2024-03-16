@@ -29,5 +29,8 @@ class PortfolioSchema(ma.Schema):
         fields = ("portfolioID", "name", "description", "holdings", "date", "ownedAssets", "userID")
         ordered=True
 
+    name = fields.String()
+    description = fields.String()
+
 portfolio_schema = PortfolioSchema()
 portfolios_schema = PortfolioSchema(many=True)

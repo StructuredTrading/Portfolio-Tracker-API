@@ -1,6 +1,6 @@
 from datetime import date
 
-from flask import Blueprint, request
+from flask import Blueprint, request, abort
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from init import db
@@ -32,16 +32,51 @@ def update_owned_assets(transaction):
     ownedAsset = db.session.scalar(stmt)
 
     # If ownedAsset exists, update the new quantity and AvgPrice
-    if ownedAsset:
+    if ownedAsset and transaction.transactionType == "buy":
+        # update quantity of owned assets
         new_quantity = ownedAsset.quantity + transaction.quantity
         ownedAsset.price=(ownedAsset.price + transaction.price / new_quantity),
         ownedAsset.quantity=new_quantity
+        
+        # Save changes to db and return
+        db.session.commit()
+        return
+    
+    # Else if owned asset exists and transaction type is 'sell'
+    elif ownedAsset and transaction.transactionType == "sell": 
 
-    # else add new asset to ownedAssets belonging to portfolioID
-    else:
+        # If portfolio contains transaction quantity
+        if ownedAsset.quantity >= transaction.quantity:
+        
+            # If selling all remaining assets
+            if (ownedAsset.quantity - transaction.quantity) == 0:
+                # Remove asset from owned assets
+                db.session.delete(ownedAsset)
+                # Commit changes to db and return
+                db.session.commit()
+                return
+        
+            # Update quantity of owned assets
+            new_quantity = ownedAsset.quantity - transaction.quantity
+            ownedAsset.price=ownedAsset.price / transaction.quantity,
+            ownedAsset.quantity=new_quantity
+            
+            # Save changes to db and return
+            db.session.commit()
+            return
+
+        # Else portfolio doesnt contain that many of the asset
+        else:
+            # Return abort message
+            abort(400, description=f"Invalid quantity, cannot sell '{transaction.quantity}'. Portfolio only contains '{ownedAsset.quantity}'")
+    
+    # If transaction type is 'buy' and asset not owned add new asset to ownedAssets belonging to portfolioID
+    if not ownedAsset and transaction.transactionType == "buy":
+
         # Retrieve Asset instance that matches assetID in transaction
         stmt = db.select(Asset).filter_by(assetID=transaction.assetID)
         asset = db.session.scalar(stmt)
+
         # Retrieve Portfolio instance that matches portfolioID in transaction
         stmt = db.select(Portfolio).filter_by(portfolioID=transaction.portfolioID)
         portfolio = db.session.scalar(stmt)
@@ -55,13 +90,22 @@ def update_owned_assets(transaction):
             asset=asset,
             portfolio=portfolio
         )
+
         # Add new instance to database
         db.session.add(new_owned_asset)
-    # Commit changes to database
-    db.session.commit()
+
+        # Commit changes to database and return
+        db.session.commit()
+        return
+    
+    # Else if portfolio does not contain asset and transaction type is 'sell'
+    else :
+        # Return abort 400 message
+        abort(400, description=f"Portfolio does not contain asset '{transaction.assetID}'")
 
 
 @transactions_bp.route("/")
+@jwt_required()
 @authorise_as_admin()
 def retrieve_all_transactions():
     """
@@ -186,18 +230,18 @@ def create_trade():
                 transactionType=data.get("transactionType"),
                 quantity=data.get("quantity"),
                 price=asset.price,
-                totalCost=asset.price * int(data.get("quantity")),
+                totalCost= (asset.price * int(data.get("quantity"))) if data.get("transactionType") == "buy" else asset.price * int(data.get("quantity")),
                 date=date.today(),
                 assetID=data.get("assetID"),
                 portfolioID=portfolio.portfolioID
             )
 
+            # Update owned assets to reflect new changes
+            update_owned_assets(new_transaction)
+            
             # Add the new transaction to the database and commit
             db.session.add(new_transaction)
             db.session.commit()
-
-            # Update owned assets to reflect new changes
-            update_owned_assets(new_transaction)
 
             # Return the new transaction details
             return transaction_schema.dump(new_transaction), 201

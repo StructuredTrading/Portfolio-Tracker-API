@@ -11,6 +11,7 @@ ownedAssets_bp = Blueprint("ownedAssets", __name__, url_prefix="/assets/owned")
 
 
 @ownedAssets_bp.route("/")
+@jwt_required()
 @authorise_as_admin()
 def retrieve_owned_assets():
     """
