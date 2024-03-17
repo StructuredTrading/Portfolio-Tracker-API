@@ -728,7 +728,62 @@ prefix for all portfolio management API endpoints (portfolio_controller):
      ```
  * **Status Codes:**
    * **'200 OK'** If the assets are successfully retrieved.
-   * **'401 Unauthorized'** If the user is not authenticated or the token is invalid.
+   * **'401 Unauthorized'** If the user is not authenticated or the token is invalid.<br>
+
+<br>
+<br>
+
+
+### **2. Retrieve Portfolio Assets by Portfolio ID**
+ * **Endpoint:** 'GET' /assets/owned/<int:portfolio_id><br>
+ * **Description:** This endpoint retrieves all assets associated with a specific portfolio ID. It ensures that the requestor has the appropriate authorization, either by being the owner of the portfolio or by possessing administrative privileges. JWT authentication is required to access this endpoint.<br>
+ * **Request Methods:** 'GET'
+ * **Requires Headers:**
+   * **'Authorization:'Bearer JWT'** - A JWT token is required for authentication, providing proof of the requestor's identity and permissions.
+ * **Success Response Example:**
+   * If the request is successful and assets exist within the specified portfolio:
+      ```json
+      [
+        {
+          "ID": 3,
+          "assetID": "ripple",
+          "name": "Ripple",
+          "portfolioID": 2,
+          "price": 0.58,
+          "quantity": 1000,
+          "symbol": "XRP"
+        },
+        {
+          "ID": 4,
+          "assetID": "litecoin",
+          "name": "Litecoin",
+          "portfolioID": 2,
+          "price": 150.75,
+          "quantity": 20,
+          "symbol": "LTC"
+        }
+      ]
+      ```
+ * **Error Response Examples:**
+   * If the requestor is not authorized to view the assets:
+      ```json
+      {
+        "error": "Not Authorised"
+      }
+      ```
+   * If no assets are found for the specified portfolio ID:
+      ```json
+      {
+        "error": "Assets with portfolioID '2' not found"
+      }
+      ```
+* **Status Codes:**
+  * **'200 OK'** If the assets are successfully retrieved.
+  * **'403 Forbidden'** If the requestor is neither the portfolio owner nor an admin.
+  * **'404 Not Found'** If no assets are found for the specified portfolio ID.
+
+<br>
+<br>
 
 ### **Assets management (assets_controller)**
 
