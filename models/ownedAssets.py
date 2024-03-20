@@ -5,6 +5,7 @@ from marshmallow.validate import Range
 class OwnedAsset(db.Model):
     __tablename__ = "ownedAssets"
 
+    # Attributes
     ID = db.Column(db.Integer, primary_key=True)
     symbol = db.Column(db.String, nullable=False)
     name = db.Column(db.String(100), nullable=False)

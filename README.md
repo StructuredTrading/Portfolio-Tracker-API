@@ -9,8 +9,6 @@
 **<a href="https://github.com/StructuredTrading/Portfolio-Tracker-API">Github - portfolio tracker API app</a>**
 
 <br>
-<br>
-<br>
 
 ### Pre-requisite's
 Must have created a database and user with ownership rights of the database or super user privillages. `.env` file must be created using: `.env.sample` as as template.
@@ -31,7 +29,7 @@ Using a terminal, run the following commands:
 <br>
 
 ### Testing / Usage
-Open insomnia and import the API endpoints using the `ENDPOINTS.json` file or manually add endpoints using the documentation below.
+Open insomnia and import the API endpoints using the `ENDPOINTS.json` file or manually add endpoints using the documentation below. Please be sure to follow all instruction's in documentation to ensure correct usage and results.
 
 <br>
 <br>
@@ -62,7 +60,7 @@ Offers a unified platform for all investment details, simplifying tracking and u
 Provides current financial data to help investors make quick, informed decisions.
 
 #### Keeps track of all transactions, asset classes and overal portfolio wealth: 
-Includes features for tracking current transactions and grouping asset classes owned together in one convenient place for quick retreival. Portfolio equity can be also be accessed easily.
+Includes features for tracking current transactions and grouping assets owned together in one convenient place for quick retreival. Portfolio equity can be also be accessed easily.
 
 #### Customizable and Scalable: 
 Can be tailored to fit individual needs and easily handles growing investment portfolios.
@@ -1099,6 +1097,84 @@ Prefix for all assets management API endpoints (assets_controller):
 
 ## R6 An ERD for your app
 
+<br>
+
+### **Users model:**
+* **Table name:** `users`
+* **Attributes:**
+  * `userID`: Primary key (PK), Integer. Uniquely identifies each user in the table.
+  * `email`: String, Email address used to create an account. Unique to each user in 'users' table as this is used as a username to log in.
+  * `password`: String minimum 6 characters in length, used with 'email' attribute to verify ownership of an account.
+  * `is_admin`: Boolean value, indicates whether the 'user' is a administrator or not.
+* **Association:**
+  * `One-to-One` with `portfolios` table, each user can own one portfolio and a user must be present for a portfolio to exist.
+
+<br>
+
+### **Portfolios model:**
+* **Table name:** `portfolios`
+* **Attributes:**
+  * `portfolioID`: Primary key (PK), Integer. Uniquely identifies each portfolio in the portfolios table.
+  * `userID`: Foreign key (FK), Integer. Links to the `users` table.
+  * `name`: String minimum 1 characters in length. Identifies the portfolio with a more easily identifiable name.
+  * `description`: String minimum 1 characters in length. Used to describe the contents of the portfolio or who it may belong to.
+  * `Holdings`: Float. Used to display current holdings (portfolio value) of the portfolio.
+  * `date`: Date. The date the portfolio was created.
+* **Association:**
+  * `One-to-One` with `users` table, each portfolio belongs to one user in the users table.
+  * `One-to-Many` with `ownedAssets` table, each portfolio can own many assets in ownedAssets table.
+  * `One-to-Many` with `transactions` table, each portfolio can have many transactions.
+
+<br>
+
+### **OwnedAssets model:**
+* **Table name:** `ownedAssets`
+* **Attributes:**
+  * `ID`: Primary key (PK), Integer. Uniquely identifies each ownedAsset in ownedAssets table.
+  * `assetID`: Foreign key (FK), String. Links to the `assets` table.
+  * `portfolioID`: Foreign key (PK), Integer. Links to the `portfolios` table.
+  * `symbol`: String. Used to more easily identify the id of the asset.
+  * `name`: String. The name of the asset that is owned.
+  * `quantity`: Integer. Used to showcase the amount of the asset which is owned.
+  * `price`: Float. The AVG price the asset was aquired for.
+* **Association:**
+  * `Many-to-One` with `portfolios` table, each ownedAsset can belong to one portfolio in the portfolios table.
+  * `Many-to-One` with `assets` table, many ownedAssets can belong to one asset.
+
+<br>
+
+### **Transactions model:**
+* **Table name:** `transactions`
+* **Attributes:**
+  * `TransactionID`: Primary key (PK), Integer. Uniquely identifies each transaction in transactions table.
+  * `portfolioID`: Foreign key (PK), Integer. Links to the `portfolios` table.
+  * `assetID`: Foreign key (FK), String. Links to the `assets` table.
+  * `transactionType`: String ('buy', 'sell'). Used to identify whether the transaction that occured 'bought' or 'sold' an asset.
+  * `quantity`: Integer. Used to showcase the amount of the asset which has been transacted.
+  * `price`: Float. The price the asset was aquired or sold for.
+  * `totalCost`: Float. The total cost of the transaction or Sum of.
+  * `date`: Date. The date that the transaction was made.
+* **Association:**
+  * `Many-to-One` with `portfolios` table, many transactions can belong to one user in the users table.
+  * `Many-to-One` with `assets` table, many transactions can belong to the one asset in assets table.
+
+<br>
+
+### **Assets model:**
+* **Table name:** `assets`
+* **Attributes:**
+  * `assetID`: Primary key (PK), String. Uniquely identifies each asset in assets table.
+  * `marketCapPos`: Integer. identifies the current market cap position or rank in the table denoted by market dominance.
+  * `symbol`: String. Used to more easily identify the id of the asset.
+  * `name`: String. The name of the asset in assets table.
+  * `price`: Float. The price the asset was aquired or sold for.
+* **Association:**
+  * `One-to-Many` with `ownedAssets` table, one asset can belong to many ownedAssets in the ownedAssets table.
+  * `One-to-Many` with `transactions` table, one asset can belong to many transactions in transactions table.
+
+<br>
+
+### **Description**
 The described Entity-Relationship Diagram (ERD) outlines a database schema for managing investment portfolios, describing the relationships between users, their investment portfolio, the assets within those portfolios, and the transactions associated to those assets. Here's a overview:
 
 <img src="./Images/Portfolio-Tracker-API_ERD.png"></img>
@@ -1153,25 +1229,229 @@ The described Entity-Relationship Diagram (ERD) outlines a database schema for m
 
 ## R8 Describe your projects models in terms of the relationships they have with each other
 
-The project's models represent a financial portfolio tracking system with entities such as users, portfolios, transactions, owned assets, and assets. The relationships between these entities are crucial for organizing how data is linked and managed within the system. Here's an overview of the models and their relationships:
+<!-- The project's models represent a financial portfolio tracking system with entities such as users, portfolios, transactions, owned assets, and assets. The relationships between these entities are crucial for organizing how data is linked and managed within the system. Here's an overview of the models and their relationships:
 
-### User and Portfolio
+### User model and Portfolio model
 - **One-to-One Relationship**: Each `User` is linked to a single `Portfolio`, and vice versa. This connection is made possible by the `portfolio` attribute in the `User` model and the `user` attribute in the `Portfolio` model. A `ForeignKey` on `userID` within the `Portfolio` model ensures this relationship's uniqueness.
 - The `cascade="all, delete"` setting on the `User` model's `portfolio` relationship specifies that deleting a `User` will also remove their associated `Portfolio`.
 
-### Portfolio and Transaction
+### Portfolio model and Transaction model
 - **One-to-Many Relationship**: A `Portfolio` can contain many `Transactions`, yet each `Transaction` is associated with only one `Portfolio`. This relationship is represented by the `transaction` attribute in the `Portfolio` model and the `portfolio` attribute in the `Transaction` model, linked by a `ForeignKey` on `portfolioID` in the `Transaction` model.
 - The `cascade="all, delete"` option means that removing a `Portfolio` also deletes all related `Transactions`.
 
-### Portfolio and OwnedAsset
-- **One-to-Many Relationship**: A `Portfolio` may alo comtain multiple `OwnedAssets`, but each `OwnedAsset` relates to a single `Portfolio`. This is managed via the `ownedAssets` relationship in the `Portfolio` model and the `portfolio` relationship in the `OwnedAsset` model, connected by a `ForeignKey` on `portfolioID` in the `OwnedAsset` model.
+### Portfolio model and OwnedAsset model
+- **One-to-Many Relationship**: A `Portfolio` may also contain multiple `OwnedAssets`, but each `OwnedAsset` relates to a single `Portfolio`. This is managed via the `ownedAssets` relationship in the `Portfolio` model and the `portfolio` relationship in the `OwnedAsset` model, connected by a `ForeignKey` on `portfolioID` in the `OwnedAsset` model.
 - The `cascade="all, delete"` setting ensures the deletion of a `Portfolio` results in the removal of all its `OwnedAssets`.
 
 ### Asset, Transaction, and OwnedAsset
 - **One-to-Many Relationship**: An `Asset` is linked to multiple `Transactions` and `OwnedAssets`, though each `Transaction` and `OwnedAsset` corresponds to only one `Asset`. These connections are denoted by the `transaction` and `ownedAssets` attributes in the `Asset` model, and the `asset` attributes in both the `Transaction` and `OwnedAsset` models. `ForeignKey` constraints on `assetID` in the `Transaction` and `OwnedAsset` models facilitate these links.
 - The `cascade="all, delete"` directives for these relationships indicate that erasing an `Asset` also eliminates all associated `Transactions` and `OwnedAssets`.
 
-The relational structure of these models offers a systematic way to manage portfolios, where users own portfolios that include transactions and assets, and assets may be part of transactions or categorized as owned assets. The inclusion of cascading delete options aids in maintaining data integrity and streamlines the management of interconnected data.
+The relational structure of these models offers a systematic way to manage portfolios, where users own portfolios that include transactions and assets, and assets may be part of transactions or categorized as owned assets. The inclusion of cascading delete options aids in maintaining data integrity and streamlines the management of interconnected data. -->
+
+In the portfolio tracker API , relationships are defined between models using SQLAlchemy, an ORM (Object-Relational Mapping) framework. These relationships are crucial for organizing and managing data within the application. Here's a breakdown of the models and their relationships:
+
+### User Model:
+```python
+class User(db.Model):
+    # Table Name
+    __tablename__ = "users"
+
+    # Table Attributes
+    userID = db.Column(db.Integer, primary_key=True)  # Primary Key
+    email = db.Column(db.String, nullable=False, unique=True)
+    password = db.Column(db.String, nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
+
+    # Relationships between Tables
+    portfolio = db.relationship("Portfolio", back_populates="user", uselist=False, cascade="all, delete")
+```
+
+The User model represents users of the system.
+It has a one-to-one relationship with the `Portfolio model`, established through a `ForeignKey` relationship in portfolios table. 
+```python
+userID = db.Column(db.Integer, db.ForeignKey("users.userID"), unique=True, nullable=False)
+```
+This signifies that each user owns a single portfolio.
+Additionally, the User model serves as the parent in a parent-child relationship with the Portfolio model.
+```python
+portfolio = db.relationship("Portfolio", back_populates="user", uselist=False, cascade="all, delete")
+```
+<br>
+
+### Portfolio Model:
+```python
+class Portfolio(db.Model):
+    # Table Name
+    __tablename__ = "portfolios"
+
+    # Table Attributes
+    portfolioID = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text)
+    holdings = db.Column(db.Float, default=0, nullable=False)
+    date = db.Column(db.Date, nullable=False)
+
+    # Foreign Keys
+    userID = db.Column(db.Integer, db.ForeignKey("users.userID"), unique=True, nullable=False)
+
+    # Relationships between Tables
+    user = db.relationship("User", back_populates="portfolio")
+    transaction = db.relationship("Transaction", back_populates="portfolio", cascade="all, delete")
+    ownedAssets = db.relationship("OwnedAsset", back_populates="portfolio", cascade="all, delete")
+```
+The Portfolio model represents portfolios owned by users.
+It has a one-to-one relationship with the User model, established through the ForeignKey relationship. 
+```python
+userID = db.Column(db.Integer, db.ForeignKey("users.userID"), unique=True, nullable=False)
+```
+This signifies that each portfolio belongs to a single user.
+Furthermore, the Portfolio model has one-to-many relationships with the Transaction and OwnedAsset models. This means that a portfolio can have multiple transactions and owned assets associated with it.
+The Portfolio model acts as the child in the parent-child relationship with the User model.
+```python
+user = db.relationship("User", back_populates="portfolio")
+```
+
+<br>
+
+### Transaction Model:
+```python
+class Transaction(db.Model):
+    # Table Name
+    __tablename__ = "transactions"
+
+    # Table Attributes
+    transactionID = db.Column(db.Integer, primary_key=True)  # Primary Key
+    transactionType = db.Column(db.String(100), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    price = db.Column(db.Float, nullable=False)
+    totalCost = db.Column(db.Float, nullable=False)
+    date = db.Column(db.Date, nullable=False)
+
+    # Foreign Keys
+    portfolioID = db.Column(db.Integer, db.ForeignKey("portfolios.portfolioID"))
+    assetID = db.Column(db.String, db.ForeignKey("assets.assetID"))
+
+    # Relationships between Tables
+    portfolio = db.relationship("Portfolio", back_populates="transaction")
+    asset = db.relationship("Asset", back_populates="transaction")
+```
+The Transaction model represents financial transactions within a portfolio.
+It has one-to-many relationships with the Portfolio and Asset models, indicating that each transaction is associated with a single portfolio and a single asset.
+The cascade="all, delete" option is utilized to ensure that deleting a portfolio or an asset also deletes associated transactions, maintaining data integrity.
+
+Sets `Transaction model` to child of parent `Portfolio Model`:
+```python
+# Child Relationship Setup in Transaction Model
+portfolio = db.relationship("Portfolio", back_populates="transaction")
+```
+```python
+# Parent Relationship Setup in Portfolio Model
+transaction = db.relationship("Transaction", back_populates="portfolio", cascade="all, delete")
+```
+
+Sets `Transaction model` to child of parent `Asset Model`:
+```python
+asset = db.relationship("Asset", back_populates="transaction")
+```
+```python
+transaction = db.relationship("Transaction", back_populates="asset", cascade="all, delete")
+```
+
+<br>
+
+### OwnedAsset Model:
+```python
+class OwnedAsset(db.Model):
+    # Table Name
+    __tablename__ = "ownedAssets"
+
+    # Table Attributes
+    ID = db.Column(db.Integer, primary_key=True)  # Primary Key
+    symbol = db.Column(db.String, nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    price = db.Column(db.Float, nullable=False)
+
+    # Foreign Keys
+    assetID = db.Column(db.String, db.ForeignKey("assets.assetID"), nullable=False)
+    portfolioID = db.Column(db.Integer, db.ForeignKey("portfolios.portfolioID"), nullable=False)
+
+    # Relationships between Tables
+    asset = db.relationship("Asset", back_populates="ownedAssets")
+    portfolio = db.relationship("Portfolio", back_populates="ownedAssets")
+```
+The OwnedAsset model represents assets owned within portfolios.
+It has many-to-one relationships with the Portfolio and Asset models, indicating that each owned asset is associated with a single portfolio and a single asset.
+The cascade="all, delete" option ensures that deleting a portfolio or an asset also deletes associated owned assets, maintaining data integrity.
+
+Sets `OwnedAsset model` to child of parent `Portfolio Model`:
+```python
+# Child Relationship Setup in Portfolio Model
+ownedAssets = db.relationship("OwnedAsset", back_populates="portfolio", cascade="all, delete")
+```
+```python
+# Parent Relationship Setup in OwnedAsset Model
+portfolio = db.relationship("Portfolio", back_populates="ownedAssets")
+```
+
+Sets `OwnedAssets model` to child of parent `Assets Model`:
+```python
+# Child Relationship Setup in Asset Model
+ownedAssets = db.relationship("OwnedAsset", back_populates="asset", cascade="all,delete")
+```
+```python
+# Parent Relationship Setup in OwnedAsset Model
+asset = db.relationship("Asset", back_populates="ownedAssets")
+```
+
+<br>
+
+
+### Asset Model:
+```python
+class Asset(db.Model):
+    # Table Name
+    __tablename__ = "assets"
+
+    # Table Attributes
+    assetID = db.Column(db.String, primary_key=True)
+    marketCapPos = db.Column(db.Integer, nullable=False)
+    symbol = db.Column(db.String, nullable=False)
+    name = db.Column(db.String, nullable=False)
+    price = db.Column(db.Float, nullable=False)
+
+    # Relationships between Tables
+    transaction = db.relationship("Transaction", back_populates="asset", cascade="all, delete")
+    ownedAssets = db.relationship("OwnedAsset", back_populates="asset", cascade="all,delete")
+```
+The Asset model represents assets available for trading.
+It has one-to-many relationships with the Transaction and OwnedAsset models, indicating that each asset can be involved in multiple transactions and owned by multiple portfolios.
+The cascade="all, delete" option ensures that deleting an asset also deletes associated transactions and owned assets, maintaining data integrity.
+
+Sets `Assets model` to parent of child `Transactions`:
+```python
+# Child Relationship Setup in Assets Model
+transaction = db.relationship("Transaction", back_populates="asset", cascade="all, delete")
+```
+```python
+# Parent Relationship Setup in Transactions Model
+asset = db.relationship("Asset", back_populates="transaction")
+```
+
+Sets `Assets model` to parent of child `Transactions`:
+```python
+# Child Relationship Setup in Assets Model
+ownedAssets = db.relationship("OwnedAsset", back_populates="asset", cascade="all,delete")
+```
+```python
+# Parent Relationship Setup in OwnedAssets Model
+asset = db.relationship("Asset", back_populates="ownedAssets")
+```
+<br>
+
+##### Summary
+In summary, the app utilize's `ForeignKey` relationships to establish associations between models, representing `one-to-one` and `one-to-many` relationships. The same method may be used differently on different models based on the specific nature of the relationships. Additionally, `parent-child` relationships are established to denote hierarchical associations, where one model acts as the `parent` and another as the `child`. These relationships are essential for organizing and managing financial data within the application.
 
 
 <br>
@@ -1180,7 +1460,7 @@ The relational structure of these models offers a systematic way to manage portf
 
 ## R9 Discuss the database relations to be implemented in your application
 
-In the application, the database relationships are created to support a financial portfolio tracking system. These relationships are key to organizing how data is structured, accessed, and managed, enabling efficient data retrieval and manipulation. Below is a summary of the key relationships and their roles:
+<!-- In the application, the database relationships are created to support a financial portfolio tracking system. These relationships are key to organizing how data is structured, accessed, and managed, enabling efficient data retrieval and manipulation. Below is a summary of the key relationships and their roles:
 
 ### User to Portfolio Relationship
 - **One-to-One**: This critical relationship ensures each user owns a unique portfolio, streamlining user management and access to financial data. A `ForeignKey` constraint on `userID` within the `Portfolio` model guarantees this relationship's exclusivity.
@@ -1196,7 +1476,48 @@ In the application, the database relationships are created to support a financia
 
 The implementation of **cascade delete** options across these relationships is critical for upholding data integrity. When a user is removed, their associated portfolio and all related data (transactions, owned assets) are likewise deleted. Similarly, eliminating a portfolio results in the deletion of its transactions and owned assets, and removing an asset eradicates all linked transactions and owned asset records. This ensures the database remains current and free from orphaned entries.
 
-By establishing these relationships, the application handles and displays financial data, equipping users with valuable, actionable insights into their investments. The thoughtful organization of these relationships fosters strong data interaction patterns, crucial for a detailed portfolio tracking system.
+By establishing these relationships, the application handles and displays financial data, equipping users with valuable, actionable insights into their investments. The thoughtful organization of these relationships fosters strong data interaction patterns, crucial for a detailed portfolio tracking system. -->
+
+
+To discuss the database relations in the application with reference to the Entity-Relationship Diagram (ERD), lets analyze the tables and the types of relationships between them:
+
+#### Users Table:
+* **Attributes:** userID (primary key), email, password, is_admin.
+* **Relationships:**
+  * One-to-Many with Portfolios: Each user can have multiple portfolios, as indicated by the foreign key userID in the portfolios table.
+
+#### Portfolios Table:
+* **Attributes:** portfolioID (primary key), userID (foreign key), name, description, holdings, date.
+* **Relationships:**
+  * Many-to-One with Users: Each portfolio belongs to a single user, as indicated by the foreign key userID in the portfolios table.
+  * One-to-Many with OwnedAssets: Each portfolio can have multiple owned assets, as indicated by the foreign key portfolioID in the ownedAssets table.
+  * One-to-Many with Transactions: Each portfolio can have multiple transactions, as indicated by the foreign key portfolioID in the transactions table.
+
+#### OwnedAssets Table:
+* **Attributes:** ID (primary key), portfolioID (foreign key), symbol, name, quantity, price.
+* **Relationships:**
+  * Many-to-One with Portfolios: Each owned asset belongs to a single portfolio, as indicated by the foreign key portfolioID in the ownedAssets table.
+
+#### Transactions Table:
+* **Attributes:** transactionsID (primary key), portfolioID (foreign key), assetID (foreign key), transactionType, quantity, price, totalCost, date.
+* **Relationships:**
+  * Many-to-One with Portfolios: Each transaction belongs to a single portfolio, as indicated by the foreign key portfolioID in the transactions table.
+  * Many-to-One with Assets: Each transaction involves a single asset, as indicated by the foreign key assetID in the transactions table.
+
+#### Assets Table:
+* **Attributes:** assetID (primary key), marketCapPos, symbol, name, price.
+* **Relationships:**
+  * One-to-Many with Transactions: Each asset can be involved in multiple transactions, as indicated by the foreign key assetID in the transactions table.
+  * One-to-Many with OwnedAssets: Each asset can be owned by multiple portfolios, as indicated by the foreign key assetID in the ownedAssets table.
+
+#### Discussion:
+* The Users table establishes a one-to-many relationship with the Portfolios table, allowing each user to have multiple portfolios.
+Portfolios table has one-to-many relationships with OwnedAssets and Transactions, indicating that each portfolio can contain multiple owned assets and transactions.
+* OwnedAssets table has a many-to-one relationship with the Portfolios table, indicating that each owned asset belongs to a single portfolio.
+* Transactions table has many-to-one relationships with both Portfolios and Assets tables, indicating that each transaction belongs to a single portfolio and involves a single asset.
+* Assets table establishes one-to-many relationships with Transactions and OwnedAssets, indicating that each asset can be involved in multiple transactions and owned by multiple portfolios.
+  
+Overall, these relationships form a coherent database structure that allows for efficient organization and management of financial data within our application.
 
 
 <br>
