@@ -1,4 +1,6 @@
 from init import db, ma
+from marshmallow import fields
+from marshmallow.validate import Range
 
 class OwnedAsset(db.Model):
     __tablename__ = "ownedAssets"
@@ -22,5 +24,6 @@ class OwnedAssetSchema(ma.Schema):
     class Meta:
         fields = ('ID', 'symbol', 'name', 'quantity', 'price', 'totalCost', 'assetID', 'portfolioID')
 
+    quantity = fields.Int(validate=Range(min=1))
 ownedAsset_schema = OwnedAssetSchema()
 ownedAssets_schema = OwnedAssetSchema(many=True)

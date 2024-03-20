@@ -33,6 +33,7 @@ def create_app():
     @app.errorhandler(400)
     def bad_request(err):
         return {"error": str(err)}, 400
+    
 
     @app.errorhandler(IntegrityError)
     def integrity_error(err):

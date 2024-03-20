@@ -8,7 +8,7 @@ class Transaction(db.Model):
     __tablename__ = "transactions"
 
     transactionID = db.Column(db.Integer, primary_key=True)
-    transactionType = db.Column(db.String(100), nullable=False, default="buy")
+    transactionType = db.Column(db.String(100), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     # price = db.Column(Numeric(precision=18, scale=8), nullable=False)
     price = db.Column(db.Float, nullable=False)
@@ -30,9 +30,9 @@ class Transaction_Schema(ma.Schema):
 
         fields = ("transactionID", "transactionType", "quantity", "price", "totalCost", "date", "portfolioID", "assetID")
 
-    transactionType = fields.String(validate=OneOf(VALID_TRANSACTIONS))
-    quantity = fields.Integer(validate=Range(min=1))
-    assetID = fields.String()
+    transactionType = fields.String(validate=OneOf(VALID_TRANSACTIONS), required=True)
+    quantity = fields.Integer(validate=Range(min=1), required=True)
+    assetID = fields.String(required=True)
 
     # email = fields.Email()
     # password = ma.String(validate=validate.Length(min=6))

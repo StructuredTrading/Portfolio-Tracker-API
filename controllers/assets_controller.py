@@ -44,7 +44,7 @@ def get_all_assets():
             return assets
         except Exception as e:
             # Handle exceptions by returning an error message and a 501 status code
-            return jsonify({"error": str(e)}), 501
+            return jsonify({"error": "Service Unavailable. Unable to retrieve data from CoinGecko at this time."}), 503
         
 
 def update_asset_prices():
@@ -61,29 +61,33 @@ def update_asset_prices():
     Requires:
     - Proper configuration and access to the CoinGecko API, as well as write access to the database where asset records are stored.
     """
-    # Retrieve all assets from the database ordered by market cap position
-    stmt = db.select(Asset).order_by(Asset.marketCapPos)
-    assets = db.session.execute(stmt).scalars().all()
+    try:
+        # Retrieve all assets from the database ordered by market cap position
+        stmt = db.select(Asset).order_by(Asset.marketCapPos)
+        assets = db.session.execute(stmt).scalars().all()
 
-    # Compile asset IDs for data fetch
-    asset_ids = [asset.assetID for asset in assets]
+        # Compile asset IDs for data fetch
+        asset_ids = [asset.assetID for asset in assets]
 
-    # Fetch updated market data from CoinGecko
-    market_data = cg.get_coins_markets(vs_currency='usd', ids=','.join(asset_ids))
+        # Fetch updated market data from CoinGecko
+        market_data = cg.get_coins_markets(vs_currency='usd', ids=','.join(asset_ids))
 
-    # Map CoinGecko IDs to their market data
-    market_data_map = {data['id']: data for data in market_data}
+        # Map CoinGecko IDs to their market data
+        market_data_map = {data['id']: data for data in market_data}
 
-    # Update database records with fetched data
-    for asset in assets:
-        # Use the mapping to access the market data for each asset
-        data = market_data_map.get(asset.assetID)
-        if data:
-            asset.price = data.get('current_price', asset.price)  # Update price
-            asset.marketCapPos = data.get('market_cap_rank', asset.marketCapPos)  # Update market cap position
-    # Commit updates to the database
-    db.session.commit()
-    return
+        # Update database records with fetched data
+        for asset in assets:
+            # Use the mapping to access the market data for each asset
+            data = market_data_map.get(asset.assetID)
+            if data:
+                asset.price = data.get('current_price', asset.price)  # Update price
+                asset.marketCapPos = data.get('market_cap_rank', asset.marketCapPos)  # Update market cap position
+        # Commit updates to the database
+        db.session.commit()
+        return
+    except Exception as e:
+            # Handle exceptions by returning an error message and a 501 status code
+            return jsonify({"error": "Service Unavailable. Unable to retrieve data from CoinGecko at this time."}), 503
 
 
 # Retrieve all available assets
@@ -159,4 +163,4 @@ def search_assets(asset_id):
     # If the asset is not found
     else:
         # Return an error message indicating the asset was not found
-        return {"error": "Asset with asset id '{asset_id}' not found"}, 404
+        return {"error": f"Asset with asset id '{asset_id}' not found"}, 404

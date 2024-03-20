@@ -1,4 +1,5 @@
 from marshmallow import fields
+from marshmallow.validate import Length
 
 from init import db, ma 
 
@@ -29,8 +30,8 @@ class PortfolioSchema(ma.Schema):
         fields = ("portfolioID", "name", "description", "holdings", "date", "ownedAssets", "userID")
         ordered=True
 
-    name = fields.String()
-    description = fields.String()
+    name = fields.String(validate=Length(min=1))
+    description = fields.String(validate=Length(min=1))
 
 portfolio_schema = PortfolioSchema()
 portfolios_schema = PortfolioSchema(many=True)

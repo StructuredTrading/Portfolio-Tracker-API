@@ -230,7 +230,7 @@ def create_trade():
                 transactionType=data.get("transactionType"),
                 quantity=data.get("quantity"),
                 price=asset.price,
-                totalCost= (asset.price * int(data.get("quantity"))) if data.get("transactionType") == "buy" else asset.price * int(data.get("quantity")),
+                totalCost= (asset.price * data.get("quantity")) if data.get("transactionType") == "buy" else asset.price * data.get("quantity"),
                 date=date.today(),
                 assetID=data.get("assetID"),
                 portfolioID=portfolio.portfolioID

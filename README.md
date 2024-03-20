@@ -130,46 +130,75 @@ While ORM has many pluses, like making development faster and your code cleaner,
 
 ### **User Management (auth_controller)**
 
-prefix for all User management API endpoints (auth_controller):
+Prefix for all User management API endpoints (auth_controller):
 
     http://localhost:5000/auth
 <br>
 
 <!-- User Registration -->
 ### **1. User Registration:**
- * **Endpoint:** 'POST' ```/auth/register```<br>
+ * **Endpoint:** 'POST' `/auth/register`<br>
+   * `http://localhost:5000/auth/register`
  * **Description:** Allows new users to register. Accessible by anyone who isn't logged in.<br>
- * **Request Methods:** ```'POST'```
+ * **Request Methods:** `'POST'`
+ * **Request Requirements:**
+    `All requirements case sensitive`
+   * `email` - Email must be a valid string containing all components that make up an email e.g., `example@domain.com`
+   * `password` - Passwords have a minimum length requirement of 6 characters and are of type string e.g., `123456`
  * **Request Body Example:**
     ```json
     {
-	"email": "test_account@email.com",
-	"password": "123456"
+      "email": "test_account@email.com",
+      "password": "123456"
     }
     ```
  * **Success Response Example:**
     ```json
     {
-	"email": "test_account@email.com",
-	"password": "$2b$12$X1HOxFaImXfPxTWbqv4zQOzykzuLVCAlhZZhSRFRHPyCW0av4rGXq",
-	"userID": 5
+      "email": "test_account@email.com",
+      "password": "$2b$12$X1HOxFaImXfPxTWbqv4zQOzykzuLVCAlhZZhSRFRHPyCW0av4rGXq",
+      "userID": 5
     }
     ```
  * **Error Response Example:**
     ```json
     {
-	"error": "Email address allready in use"
+	  "error": "Email address allready in use"
     }
     ```
+    ```json
+    {
+	  "error": "The 'email' field is required"
+    }
+    ```
+    ```json
+    {
+	  "error": "The 'password' field is required"
+    }
+    ```
+    ```json
+    {
+	  "error": "{'email': ['Not a valid email address.'], 'password': ['Shorter than minimum length 6.']}"
+    }
+    ```
+
  * **Status Codes:**
    * **'201 Created'** if the registration is successful.
-   * **'400 Bad Request'** if the input validation fails (e.g., missing email or password, email email allready in use).
+   * **'400 Bad Request'** if the input validation fails (e.g., missing email or password, email email allready in use, email or password not valid).
+
+<br>
+<br>
 
 <!-- User Login -->
 ### **2. User Login:**
- * **Endpoint:** 'POST' ```/auth/login```<br>
- * **Description:** Authenticates users and returns a token (JWT). Accessible by anyone who isn't logged in.<br>
- * **Request Methods:** ```'POST'```
+ * **Endpoint:** 'POST' `/auth/login`<br>
+   * `http://localhost:5000/auth/login`
+ * **Description:** Authenticates users and returns a token (JWT). Accessible by anyone who isn't logged in with a valid username and password.<br>
+ * **Request Methods:** `'POST'`
+ * **Request Requirements:**
+    `All requirements case sensitive`
+   * `email` - Email must be a valid string containing all components that make up an email e.g., `example@domain.com`
+   * `password` - Passwords have a minimum length requirement of 6 characters and are of type string e.g., `123456`
  * **Request Body Example:**
     ```json
     {
@@ -191,15 +220,25 @@ prefix for all User management API endpoints (auth_controller):
 	"error": "Invalid email or password"
     }
     ```
+    ```json
+    {
+	  "error": "{'email': ['Not a valid email address.'], 'password': ['Shorter than minimum length 6.']}"
+    }
+    ```
  * **Status Codes:**
    * **'200 OK'** if the login is successful.
    * **'401 Unauthorised'** if the email or password is incorrect.
+   * **'400 Bad Request'** if the input validation fails (e.g., incorrect email format or password not required minimum length)
+
+<br>
+<br>
 
 <!-- Delete User -->
 ### **3. Delete User** 
- * **Endpoint:** 'DELETE' ```/auth/<int:user_id>```<br>
+ * **Endpoint:** 'DELETE' `/auth/<int:user_id>`<br>
+   * `http://localhost:5000/auth/delete/<int:user_id>`
  * **Description:** This endpoint allows for the deletion of a specific user by their user ID. It can be accessed by the user themselves (if the user_id in the URL matches the currently logged-in userID) or by an authenticated user with administrative privileges. This setup enables users to delete their own account or allows administrators to remove user accounts and associated data from the system.<br>
- * **Request Methods:** ```'DELETE'```
+ * **Request Methods:** `'DELETE'`
  * **URL Parameters:** 'user_id' - The unique identifier (integer) of the user to be deleted.
  * **Requires Headers:**
    * **'Authorization':'Bearer JWT'** - The JWT token obtained upon authenticating. The token should either belong to the user being deleted or to an administritive user.
@@ -207,11 +246,11 @@ prefix for all User management API endpoints (auth_controller):
    * If the user is successfully deleted:
         ```json
         {
-        "message": "User with userID '<user_id>' was successfully deleted."
+          "message": "User with userID '<user_id>' successfully deleted."
         }
         ```
  * **Error Response Examples:**
-   * If the user is not authenticated, the token is invalid, or the user_id does not match, and the user is not an admin:
+   * The user_id does not match the current user, and the user is not an admin:
         ```json
         {
         "error": "Unauthorized. You do not have permission to perform this action."
@@ -220,20 +259,21 @@ prefix for all User management API endpoints (auth_controller):
     * If the user to be deleted does not exist:
         ```json
         {
-        "error": "User with userID '<user_id>' does not exist."
+        "error": "User with 'userID' '<user_id>' does not exist."
         }
         ```
  * **Status Codes:**
    * **'200 Ok'** If the user is successfully deleted.
-   * **'401 Unauthorised'** If the user is not authenticated, the token is invalid, or the user_id does not match, and the user is not an admin.
+   * **'403 Forbidden'** The user_id does not match, and the user is not an admin.
    * **'404 Not Found'** If the user is not found.
 
+<br>
 <br>
 <br>
 
 ### **Portfolio Management (portfolio_controller)**
 
-prefix for all portfolio management API endpoints (portfolio_controller):
+Prefix for all portfolio management API endpoints (portfolio_controller):
 
     http://localhost:5000/portfolios
 <br>
@@ -241,8 +281,12 @@ prefix for all portfolio management API endpoints (portfolio_controller):
 <!-- Create Portfolio -->
 ### **1. Create Portfolio**
  * **Endpoint:** 'POST' `/portfolios/create`<br>
+   * `http://localhost:5000/portfolios/create`
  * **Description:** This endpoint enables authenticated users to create a new portfolio. It requires users to be logged in and provide necessary portfolio details through the request body. The newly created portfolio is associated with the user's account based on their authentication token.<br>
  * **Request Methods:** `'POST'`
+ * **Request Requirements:**
+   * `name` - Name must be a valid string type containing atleast 1 character.
+   * `description` - Description must be a valid string type containing atleast 1 character.
  * **Request Body Example:**
    ```json
    {
@@ -256,34 +300,51 @@ prefix for all portfolio management API endpoints (portfolio_controller):
    * If the portfolio is successfully created:
      ```json
      {
-       "message": "Portfolio 'My Investment Portfolio' was successfully created.",
-       "portfolioID": 1,
-       "userID": "<user_id>"
+      "date": "2024-03-16",
+      "description": "My Investment Portfolio",
+      "holdings": 0.0,
+      "name": "A diversified portfolio of cryptocurrencies",
+      "ownedAssets": [],
+      "portfolioID": 3,
+      "userID": 3
      }
      ```
  * **Error Response Examples:**
-   * If the user is not authenticated or the token is invalid:
+   * If the user allready owns a portfolio:
      ```json
      {
-       "error": "Unauthorized. You must be logged in to perform this action."
+      "error": "User '6' is not allowed to create more than one portfolio, user '6' allready has a portfolio called 'My portfolio'."
      }
      ```
    * If required data is missing or invalid in the request body:
      ```json
      {
-       "error": "Bad Request. Missing or invalid data provided."
+	    "error": "{'name': ['Not a valid string.'], 'description': ['Not a valid string.']}"
+     }
+     ```
+     ```json
+     {
+        "error": "{'name': ['Shorter than minimum length 1.'], 'description': ['Shorter than minimum length 1.']}"
+     }
+     ```
+     ```json
+     {
+      "error": "{'name': ['Not a valid string.'], 'description': ['Not a valid string.']}"
      }
      ```
  * **Status Codes:**
    * **'201 Created'** If the portfolio is successfully created.
    * **'400 Bad Request'** If there is missing or invalid data in the request body.
-   * **'401 Unauthorized'** If the user is not authenticated or the token is invalid.
+   * **'403 Forbidden'** If the user allready owns a portfolio.
   
+  <br>
+  <br>
 
 <!-- Retrieve All Portfolios -->
 ### **2. Retrieve All Portfolios**
  * **Endpoint:** 'GET' `/portfolios`<br>
- * **Description:** This endpoint retrieves all portfolios from the database. It is accessible only by users with administrative privileges, allowing for a comprehensive view of all user portfolios.<br>
+   * `http://localhost:5000/portfolios/`
+ * **Description:** This endpoint retrieves all portfolios from the database. It is accessible only by an administrator, allowing for a comprehensive view of all user portfolios.<br>
  * **Request Methods:** `'GET'`
  * **Requires Headers:**
    * **'Authorization':'Bearer JWT'** - The JWT token obtained upon logging in. This token should belong to an administrative user.
@@ -291,36 +352,66 @@ prefix for all portfolio management API endpoints (portfolio_controller):
    * If the request is successful:
      ```json
      [
-       {
-         "portfolioID": 1,
-         "name": "Investment Portfolio A",
-         "userID": "2"
-       },
-       {
-         "portfolioID": 2,
-         "name": "Investment Portfolio B",
-         "userID": "3"
-       }
+      {
+        "date": "2024-03-16",
+        "description": "A Portfolio that is owned by Admin.",
+        "holdings": 4604232.317,
+        "name": "Admin Portfolio",
+        "ownedAssets": [
+          {
+            "ID": 7,
+            "assetID": "litecoin",
+            "name": "Litecoin",
+            "portfolioID": 1,
+            "price": 86.8,
+            "quantity": 10,
+            "symbol": "LTC"
+          },
+          {
+            "ID": 8,
+            "assetID": "bitcoin",
+            "name": "Bitcoin",
+            "portfolioID": 1,
+            "price": 67663.0,
+            "quantity": 10,
+            "symbol": "BTC"
+          }
+        ],
+        "portfolioID": 1,
+        "userID": 1
+      },
+      {
+        "date": "2024-03-16",
+        "description": "A diversified portfolio of cryptocurrencies",
+        "holdings": 0.0,
+        "name": "My Investment Portfolio",
+        "ownedAssets": [],
+        "portfolioID": 2,
+        "userID": 2
+      }
      ]
      ```
  * **Error Response Examples:**
    * If the user is not an admin:
      ```json
      {
-       "error": "Unauthorized. Administrative access required."
+      "error": "Not authorised to perform this action"
      }
      ```
  * **Status Codes:**
    * **'200 OK'** If the request is successful.
-   * **'401 Unauthorized'** If the user is not authenticated as an admin.
+   * **'403 Forbidden'** If the user is not authenticated as an admin.
    
+<br>
+<br>
 
 <!-- Search Portfolio -->
 ### **3. Search Portfolio**
- * **Endpoint:** 'GET' `/portfolios/<portfolio_id>`<br>
+ * **Endpoint:** 'GET' `/portfolios/<int:portfolio_id>`<br>
+   * `http://localhost:5000/portfolios/search/<int:portfolio_id>`
  * **Description:** Displays details of a specific portfolio. This endpoint is accessible by the owner of the portfolio or an administrator, ensuring privacy and administrative oversight.<br>
  * **Request Methods:** `'GET'`
- * **URL Parameters:** 'id' - The unique identifier of the portfolio to be retrieved.
+ * **URL Parameters:** '<int:portfolio_id>' - The unique identifier of the portfolio to be retrieved of type 'Integer'.
  * **Requires Headers:**
    * **'Authorization':'Bearer JWT'** - The JWT token obtained upon logging in. The token should either belong to the portfolio's owner or to an administrative user.
  * **Success Response Example:**
@@ -336,27 +427,36 @@ prefix for all portfolio management API endpoints (portfolio_controller):
    * If the portfolio does not exist or the user does not have permission to view it:
      ```json
      {
-       "error": "Unauthorized or Portfolio not found."
+       "error": "Not authorised to perform this action"
      }
      ```
+     ```json
+     {
+      "error": "Portfolio with id '16' not found"
+     }
  * **Status Codes:**
    * **'200 OK'** If the portfolio is successfully retrieved.
-   * **'401 Unauthorized'** If the user is not authenticated or lacks access.
+   * **'403 Forbidden'** If the user lacks access.
    * **'404 Not Found'** If the portfolio does not exist.
-   
+
+<br>
+<br>   
 
 <!-- Update Portfolio -->
 ### **4. Update Portfolio**
- * **Endpoint:** 'PATCH' `/portfolios/<portfolio_id>`<br>
- * **Description:** This endpoint allows for the editing of details of a specific portfolio. It ensures that portfolio management is personal and secure by granting access exclusively to the portfolio's owner or to an administrative user. The flexibility to update portfolio details such as its name, description, or other attributes enables users to maintain accurate and up-to-date information.<br>
+ * **Endpoint:** 'PATCH' `/portfolios/<int:portfolio_id>`<br>
+   * `http://localhost:5000/portfolios/update/<int:portfolio_id>`
+ * **Description:** This endpoint allows for the editing of details of a specific portfolio. It ensures that portfolio management is personal and secure by granting access exclusively to the portfolio's owner or to an administrative user. The flexibility to update portfolio details such as its name or description and enables users to maintain accurate and up-to-date information.<br>
  * **Request Methods:** `'PATCH'`
- * **URL Parameters:** 'id' - The unique identifier (integer) of the portfolio to be updated.
+ * **URL Parameters:** '<int:portfolio_id>' - The unique identifier (integer) of the portfolio to be updated.
+ * **Request Requirements:**
+   * `name` - Name must be a valid string type containing atleast 1 character.
+   * `description` - Description must be a valid string type containing atleast 1 character.
  * **Request Body Example:**
    ```json
    {
      "name": "Updated Portfolio Name",
-     "description": "New description of the portfolio",
-     "holdings": 150000  // Example of an attribute that might be updated
+     "description": "New description of the portfolio"
    }
  * **Requires Headers:**
    * **'Authorization':'Bearer JWT'** - The JWT token must be provided in the request header to authenticate. This token verifies the identity of the requester, ensuring that only the portfolio's owner or an administrative user can perform updates.
@@ -364,77 +464,108 @@ prefix for all portfolio management API endpoints (portfolio_controller):
    * If the portfolio is successfully updated:
      ```json
      {
-       "message": "Portfolio with ID '<id>' was successfully updated."
+       "date": "2024-03-16",
+       "description": "New description of the portfolio",
+       "holdings": 0.0,
+       "name": "Updated Portfolio Name",
+       "ownedAssets": [],
+       "portfolioID": 2,
+       "userID": 2
      }
      ```
  * **Error Response Examples:**
    * If the user is not authenticated, the token is invalid, or the user does not have the necessary permissions:
      ```json
      {
-       "error": "Unauthorized. You do not have permission to perform this action."
+       "error": "Not authorised to perform this action"
      }
      ```
    * If the portfolio to be updated does not exist:
      ```json
      {
-       "error": "Portfolio with ID '<id>' does not exist."
+       "error": "Portfolio with id '65' not found"
      }
      ```
  * **Status Codes:**
    * **'200 OK'** If the portfolio is successfully updated.
    * **'400 Bad Request'** If the request body is missing required attributes or contains invalid data.
-   * **'401 Unauthorized'** If the user is not authenticated or lacks the necessary permissions to update the portfolio.
+   * **'403 Forbidden'** If the user lacks the necessary permissions to update the portfolio.
    * **'404 Not Found'** If the specified portfolio does not exist.
+  
+<br>
+<br>
 
 <!-- Delete Portfolio -->
 ### **5. Delete Portfolio**
- * **Endpoint:** 'DELETE' `/portfolios/<portfolio_id>`<br>
+ * **Endpoint:** 'DELETE' `/portfolios/<int:portfolio_id>`<br>
+   * `http://localhost:5000/portfolios/delete/<int:portfolio_id>`
  * **Description:** This endpoint facilitates the removal of a specific portfolio from the system. It is designed to ensure secure portfolio management by allowing only the portfolio's owner or an administrative user to delete a portfolio. This operation permanently deletes the portfolio and its associated data, underscoring the importance of cautious use.<br>
  * **Request Methods:** `'DELETE'`
- * **URL Parameters:** 'id' - The unique identifier (integer) of the portfolio to be deleted.
+ * **URL Parameters:** '<int:portfolio_id>' - The unique identifier (integer) of the portfolio to be deleted.
  * **Requires Headers:**
    * **'Authorization':'Bearer JWT'** - To authenticate the request, a JWT token must be included in the Authorization header. This token serves to identify the requester, confirming whether they are the owner of the portfolio in question or an administrative user with the authority to delete it.
  * **Success Response Example:**
    * If the portfolio is successfully deleted:
      ```json
      {
-       "message": "Portfolio with ID '<id>' was successfully deleted."
+       "message": "Portfolio 'Updated Portfolio Name' with portfolio ID '2' has successfully been deleted."
      }
      ```
  * **Error Response Examples:**
-   * If the user is not authenticated, the token is invalid, or the user does not have the necessary permissions:
+   * If the user does not have the necessary permissions:
      ```json
      {
-       "error": "Unauthorized. You do not have permission to perform this action."
+       "error": "Only the portfolio owner or an admin can delete the requested portfolio"
      }
      ```
    * If the specified portfolio does not exist:
      ```json
      {
-       "error": "Portfolio with ID '<id>' does not exist."
+       "error": "Portfolio with ID '101' not found."
      }
      ```
  * **Status Codes:**
    * **'200 OK'** If the portfolio is successfully deleted.
-   * **'401 Unauthorized'** If the user is not authenticated or lacks the necessary permissions to delete the portfolio.
+   * **'403 Forbidden'** If the user lacks the necessary permissions to delete the portfolio.
    * **'404 Not Found'** If the specified portfolio does not exist.
 
+<br>
+<br>
+<br>
 
 
 ### Transactions Management (transactions_controller)
 
+Prefix for all transactions management API endpoints (transactions_controller):
+
+    http://localhost:5000/transactions
+
+<br>
+<br>
 
 <!-- Create Transaction -->
 ### **1. Create Transaction**
  * **Endpoint:** 'POST' `/transactions/trade`<br>
+   * `http://localhost:5000/transactions/trade`
  * **Description:** This endpoint allows logged-in users to add a new transaction to their account. It automatically associates the created transaction with the userID of the currently logged-in user, enabling users to track their trades or investments in a personal and secure manner. This functionality is essential for maintaining an accurate and up-to-date record of the user's financial activities.<br>
  * **Request Methods:** `'POST'`
+ * **Request Requirements:**
+   * `transactionType` - Transaction type must be of type string and be one of the following two options (CASE SENSITIVE) `buy` `sell`.
+   * `quantity` - Quantity must be of type integer and greater then or equal to 1.
+   * `assetID` - Asset id must be of type string and must match one of the available to trade assets (This can be found by using the retrieve all assets endpoint). e.g., `bitcoin` `ethereum` `litecoin`
  * **Request Body Example:**
    ```json
     {
         "transactionType": "buy",
         "quantity": "25",
         "assetID": "bitcoin"
+    }
+   ```
+   ```json
+    {
+        "transactionType": "sell",
+        "quantity": "15",
+        "assetID": "ethereum"
     }
    ```
  * **Requires Headers:**
@@ -455,112 +586,162 @@ prefix for all portfolio management API endpoints (portfolio_controller):
      ```
 
  * **Error Response Examples:**
-   * If the user is not authenticated or the token is invalid:
+   * If the user does not own a portfolio:
      ```json
      {
-       "error": "Unauthorized. You must be logged in to perform this action."
+      "error": "You must create a portfolio first"
      }
      ```
-   * If required data is missing or invalid in the request body:
+   * If required data is missing in the request body:
      ```json
      {
-       "error": "Bad Request. Missing or invalid data provided."
+      "error": "{'transactionType': ['Missing data for required field.']}"
+     }
+     ```
+     ```json
+     {
+      "error": "{'quantity': ['Missing data for required field.']}"
+     }
+     ```
+     ```json
+     {
+      "error": "{'assetID': ['Missing data for required field.']}"
+     }
+     ```
+   * If required data is invalid in the request body:
+     ```json
+     {
+      "error": "{'transactionType': ['Not a valid string.']}"
+     }
+     ```
+     ```json
+     {
+      "error": "{'quantity': ['Not a valid integer.']}"
+     }
+     ```
+     ```json
+     {
+      "error": "{'assetID': ['Not a valid string.']}"
+     }
+     ```
+   * If assetID is not found in the db: 
+     ```json
+     {
+       "error": "Asset id not found."
      }
      ```
  * **Status Codes:**
    * **'201 Created'** If the transaction is successfully created.
    * **'400 Bad Request'** If there is missing or invalid data in the request body.
-   * **'401 Unauthorized'** If the user is not authenticated or the token is invalid.
+   * **'404 Not Found'** If the assetID is not found in the db.
+   * **'403 Forbidden'** If user does not own a portfolio.
+
+<br>
+<br>
 
 
-
-
-#### 2. List Transactions/Assets
- * **Endpoint:** 'GET' `/portfolios/<portfolio_id>/transactions`<br>
- * **Description:** This endpoint retrieves a list of transactions or assets associated with a specific portfolio. It is designed to be accessible exclusively by the owner of the portfolio, ensuring privacy and security in financial tracking. This functionality enables users to view their investment history and asset allocation within a particular portfolio.<br>
+#### 2. List Transactions
+ * **Endpoint:** 'GET' `/transactions`<br>
+   * `http://localhost:5000/transactions`
+ * **Description:** This endpoint retrieves a list of transactions associated with all portfolios. It is designed to be accessible exclusively by an admin.<br>
  * **Request Methods:** `'GET'`
- * **URL Parameters:** 'portfolio_id' - The unique identifier (integer) of the portfolio whose transactions or assets are to be retrieved.
  * **Requires Headers:**
-   * **'Authorization':'Bearer JWT'** - To access this endpoint, a JWT token must be provided in the Authorization header. This token verifies the identity of the requester, confirming that they are the owner of the specified portfolio.
+   * **'Authorization':'Bearer JWT'** - To access this endpoint, a JWT token must be provided in the Authorization header. This token verifies the identity of the requester, confirming that they are in fact an administrator.
  * **Success Response Example:**
-   * If the request is successful, a list of transactions or assets is returned:
+   * If the request is successful, a list of transactions is returned:
      ```json
      [
-        {
-            "assetID": "bitcoin",
-            "date": "2024-03-12",
-            "portfolioID": 1,
-            "price": 72093.0,
-            "quantity": 10,
-            "totalCost": 720930.0,
-            "transactionID": 1,
-            "transactionType": "buy"
-        },
-        {
-            "assetID": "ethereum",
-            "date": "2024-03-12",
-            "portfolioID": 1,
-            "price": 4012.25,
-            "quantity": 5,
-            "totalCost": 20061.25,
-            "transactionID": 2,
-            "transactionType": "buy"
-        },
-        {
-            "assetID": "litecoin",
-            "date": "2024-03-12",
-            "portfolioID": 1,
-            "price": 98.01,
-            "quantity": 30,
-            "totalCost": 2940.3,
-            "transactionID": 3,
-            "transactionType": "buy"
-        },
-        {
-            "assetID": "dogecoin",
-            "date": "2024-03-12",
-            "portfolioID": 1,
-            "price": 0.171199,
-            "quantity": 1000,
-            "totalCost": 171.2,
-            "transactionID": 4,
-            "transactionType": "buy"
-        },
-        {
-            "assetID": "bitcoin",
-            "date": "2024-03-13",
-            "portfolioID": 1,
-            "price": 72025.0,
-            "quantity": 25,
-            "totalCost": 1800625.0,
-            "transactionID": 17,
-            "transactionType": "buy"
-        }
+      {
+        "assetID": "bitcoin",
+        "date": "2024-03-16",
+        "portfolioID": 1,
+        "price": 68131.0,
+        "quantity": 10,
+        "totalCost": 681310.0,
+        "transactionID": 1,
+        "transactionType": "buy"
+      },
+      {
+        "assetID": "ethereum",
+        "date": "2024-03-16",
+        "portfolioID": 3,
+        "price": 3688.41,
+        "quantity": 5,
+        "totalCost": 18442.05,
+        "transactionID": 2,
+        "transactionType": "buy"
+      },
+      {
+        "assetID": "litecoin",
+        "date": "2024-03-16",
+        "portfolioID": 1,
+        "price": 89.2,
+        "quantity": 30,
+        "totalCost": 2676.0,
+        "transactionID": 3,
+        "transactionType": "buy"
+      },
+      {
+        "assetID": "dogecoin",
+        "date": "2024-03-16",
+        "portfolioID": 3,
+        "price": 0.156731,
+        "quantity": 1000,
+        "totalCost": 156.73,
+        "transactionID": 4,
+        "transactionType": "buy"
+      },
+      {
+        "assetID": "binancecoin",
+        "date": "2024-03-16",
+        "portfolioID": 2,
+        "price": 602.14,
+        "quantity": 10,
+        "totalCost": 6021.4,
+        "transactionID": 5,
+        "transactionType": "sell"
+      },
+      {
+        "assetID": "binancecoin",
+        "date": "2024-03-16",
+        "portfolioID": 2,
+        "price": 602.14,
+        "quantity": 10,
+        "totalCost": 6021.4,
+        "transactionID": 6,
+        "transactionType": "sell"
+      },
+      {
+        "assetID": "binancecoin",
+        "date": "2024-03-16",
+        "portfolioID": 1,
+        "price": 602.14,
+        "quantity": 10,
+        "totalCost": 6021.4,
+        "transactionID": 7,
+        "transactionType": "sell"
+      }
      ]
      ```
 
  * **Error Response Examples:**
-   * If the user is not authenticated or does not own the specified portfolio:
+   * If the user is not authorised:
      ```json
      {
-       "error": "Unauthorized. Access is restricted to the portfolio's owner."
-     }
-     ```
-   * If the specified portfolio does not exist:
-     ```json
-     {
-       "error": "Not Found. Portfolio with ID '<portfolio_id>' does not exist."
+       "error": "Not authorised to perform this action"
      }
      ```
  * **Status Codes:**
    * **'200 OK'** If the transactions or assets are successfully retrieved.
-   * **'401 Unauthorized'** If the user is not authenticated or does not own the specified portfolio.
-   * **'404 Not Found'** If the specified portfolio does not exist.
+   * **'403 Forbidden'** If the user is not authorised (not an admin).
 
+<br>
+<br>
 
 <!-- Search for Transaction -->
 ### **1. Search for Transaction**
- * **Endpoint:** 'GET' `/transactions/search/<transaction_id>`<br>
+ * **Endpoint:** 'GET' `/transactions/search/<int:transaction_id>`<br>
+   * `http://localhost:5000/transactions/search/<int:transaction_id>`
  * **Description:** This endpoint is designed to retrieve a specific transaction. It ensures secure access by allowing only the portfolio's owner or an administrative user to retrieve transaction details. This capability is crucial for reviewing individual transactions, auditing, and comprehensive portfolio management.<br>
  * **Request Methods:** `'GET'`
  * **URL Parameters:** 'transaction_id' - The unique identifier (integer) of the transaction which is to be searched for.
@@ -570,31 +751,32 @@ prefix for all portfolio management API endpoints (portfolio_controller):
    * If the transaction is found:
      ```json
      {
-       "transactionID": "<transaction_id>",
-       "portfolioID": "<portfolio_id>",
-       "assetID": "bitcoin",
-       "transactionType": "buy",
-       "quantity": 1,
-       "price": 50000,
-       "date": "2024-01-15"
+      "assetID": "bitcoin",
+      "date": "2024-03-19",
+      "portfolioID": 1,
+      "price": 63265.0,
+      "quantity": 10,
+      "totalCost": 632650.0,
+      "transactionID": 1,
+      "transactionType": "buy"
      }
      ```
  * **Error Response Examples:**
    * If the user is not authenticated, does not own the specified transaction, or is not an admin:
      ```json
      {
-       "error": "Unauthorized. Access is restricted to the portfolio's owner or an admin."
+       "error": "Not Authorised to view transaction"
      }
      ```
    * If the specified transaction does not exist:
      ```json
      {
-       "error": "Not Found. The specified transaction does not exist."
+       "error": "Transaction not found"
      }
      ```
  * **Status Codes:**
    * **'200 OK'** If the specific transaction is successfully retrieved.
-   * **'401 Unauthorized'** If the user is not authenticated or does not have the necessary permissions to access the transaction.
+   * **'403 Forbidden'** If the user lacks the necessary permissions to access the transaction.
    * **'404 Not Found'** If the specified transaction does not exist.
 
 
@@ -603,132 +785,69 @@ prefix for all portfolio management API endpoints (portfolio_controller):
 
 ### **Owned Assets management (ownedAssets_controller)**
 
+Prefix for all owned assets management API endpoints (ownedAssets_controller):
+
+    http://localhost:5000/assets/owned
 
 ### **1. Retrieve all owned Assets**
  * **Endpoint:** 'GET' `/assets/owned`<br>
- * **Description:** This endpoint is designed to retrieve a comprehensive list of assets owned by the currently authenticated user. For users with administrative privileges, it provides a broader access scope, allowing them to retrieve details of all assets across all users. This functionality is essential for enabling users to overview their investment portfolio and for admins to manage and audit assets across the platform.<br>
+   * `http://localhost:5000/assets/owned`
+ * **Description:** This endpoint is designed to retrieve a comprehensive list of assets owned by all users. This functionality is essential for admins to manage and audit assets across the platform.<br>
  * **Request Methods:** `'GET'`
  * **Requires Headers:**
-   * **'Authorization':'Bearer JWT'** - A JWT token must be provided in the Authorization header for authenticating the user. This token determines whether the requester is a regular user, retrieving their own assets, or an admin, accessing a comprehensive list of all assets.
+   * **'Authorization':'Bearer JWT'** - A JWT token must be provided in the Authorization header for authenticating the user. This token determines whether the requester is an admin, accessing a comprehensive list of all assets.
  * **Success Response Example:**
-   * If the request is successful, for a regular user, it returns a list of assets owned by them:
+   * If the request is successful, it returns a list of all assets owned by all users:
      ```json
      [
-       {
-         "ID": 1,
-		 "assetID": "bitcoin",
-		 "name": "Bitcoin",
-		 "portfolioID": 1,
-		 "price": 74150.85714285714,
-		 "quantity": 35,
-		 "symbol": "BTC"
-       },
-       {
-         "ID": 2,
-		 "assetID": "ethereum",
-		 "name": "Ethereum",
-		 "portfolioID": 1,
-		 "price": 3200,
-		 "quantity": 5,
-		 "symbol": "ETH"
-       }
-     ]
-     ```
-   * For an admin, it might return all assets across all users:
-     ```json
-     [
-        {
-            "assetID": "bitcoin",
-            "date": "2024-03-12",
-            "portfolioID": 1,
-            "price": 72093.0,
-            "quantity": 10,
-            "totalCost": 720930.0,
-            "transactionID": 1,
-            "transactionType": "buy"
-        },
-        {
-            "assetID": "ethereum",
-            "date": "2024-03-12",
-            "portfolioID": 1,
-            "price": 4012.25,
-            "quantity": 5,
-            "totalCost": 20061.25,
-            "transactionID": 2,
-            "transactionType": "buy"
-        },
-        {
-            "assetID": "litecoin",
-            "date": "2024-03-12",
-            "portfolioID": 1,
-            "price": 98.01,
-            "quantity": 30,
-            "totalCost": 2940.3,
-            "transactionID": 3,
-            "transactionType": "buy"
-        },
-        {
-            "assetID": "dogecoin",
-            "date": "2024-03-12",
-            "portfolioID": 1,
-            "price": 0.171199,
-            "quantity": 1000,
-            "totalCost": 171.2,
-            "transactionID": 4,
-            "transactionType": "buy"
-        },
-        {
-            "assetID": "bitcoin",
-            "date": "2024-03-13",
-            "portfolioID": 1,
-            "price": 72025.0,
-            "quantity": 25,
-            "totalCost": 1800625.0,
-            "transactionID": 17,
-            "transactionType": "buy"
-        },
-        {
-            "assetID": "bitcoin",
-            "date": "2024-03-13",
-            "portfolioID": 5,
-            "price": 72052.0,
-            "quantity": 25,
-            "totalCost": 1801300.0,
-            "transactionID": 20,
-            "transactionType": "buy"
-        },
-        {
-            "assetID": "ethereum",
-            "date": "2024-03-13",
-            "portfolioID": 5,
-            "price": 4043.55,
-            "quantity": 5,
-            "totalCost": 20217.75,
-            "transactionID": 21,
-            "transactionType": "buy"
-        },
-        {
-            "assetID": "litecoin",
-            "date": "2024-03-13",
-            "portfolioID": 5,
-            "price": 98.2,
-            "quantity": 100,
-            "totalCost": 9820.0,
-            "transactionID": 22,
-            "transactionType": "buy"
-        }
+      {
+        "ID": 1,
+        "assetID": "bitcoin",
+        "name": "Bitcoin",
+        "portfolioID": 1,
+        "price": 63265.0,
+        "quantity": 10,
+        "symbol": "BTC"
+      },
+      {
+        "ID": 2,
+        "assetID": "ethereum",
+        "name": "Ethereum",
+        "portfolioID": 1,
+        "price": 3250.61,
+        "quantity": 5,
+        "symbol": "ETH"
+      },
+      {
+        "ID": 3,
+        "assetID": "litecoin",
+        "name": "Litecoin",
+        "portfolioID": 1,
+        "price": 78.49,
+        "quantity": 30,
+        "symbol": "LTC"
+      },
+      {
+        "ID": 4,
+        "assetID": "cardano",
+        "name": "Cardano",
+        "portfolioID": 1,
+        "price": 0.605016,
+        "quantity": 1000,
+        "symbol": "ADA"
+      }
      ]
      ```
  * **Error Response Examples:**
-   * If the user is not authenticated or the token is invalid:
+   * If the user is authorised as an admin:
      ```json
      {
-       "error": "Unauthorized. Authentication required to access this resource."
+       "error": "Not authorised to perform this action"
      }
      ```
  * **Status Codes:**
    * **'200 OK'** If the assets are successfully retrieved.
-   * **'401 Unauthorized'** If the user is not authenticated or the token is invalid.<br>
+   * **'403 Forbidden'** If the user is authorised as an admin.<br>
 
 <br>
 <br>
@@ -736,8 +855,10 @@ prefix for all portfolio management API endpoints (portfolio_controller):
 
 ### **2. Retrieve Portfolio Assets by Portfolio ID**
  * **Endpoint:** 'GET' /assets/owned/<int:portfolio_id><br>
+   * `http://localhost:5000/assets/owned/<int:portfolio_id`
  * **Description:** This endpoint retrieves all assets associated with a specific portfolio ID. It ensures that the requestor has the appropriate authorization, either by being the owner of the portfolio or by possessing administrative privileges. JWT authentication is required to access this endpoint.<br>
  * **Request Methods:** 'GET'
+ * **URL Parameters:** '<int:portfolio_id>' - The unique identifier (integer) of the portfolio owned assets to be retrieved.
  * **Requires Headers:**
    * **'Authorization:'Bearer JWT'** - A JWT token is required for authentication, providing proof of the requestor's identity and permissions.
  * **Success Response Example:**
@@ -745,22 +866,40 @@ prefix for all portfolio management API endpoints (portfolio_controller):
       ```json
       [
         {
+          "ID": 1,
+          "assetID": "bitcoin",
+          "name": "Bitcoin",
+          "portfolioID": 1,
+          "price": 63265.0,
+          "quantity": 10,
+          "symbol": "BTC"
+        },
+        {
+          "ID": 2,
+          "assetID": "ethereum",
+          "name": "Ethereum",
+          "portfolioID": 1,
+          "price": 3250.61,
+          "quantity": 5,
+          "symbol": "ETH"
+        },
+        {
           "ID": 3,
-          "assetID": "ripple",
-          "name": "Ripple",
-          "portfolioID": 2,
-          "price": 0.58,
-          "quantity": 1000,
-          "symbol": "XRP"
+          "assetID": "litecoin",
+          "name": "Litecoin",
+          "portfolioID": 1,
+          "price": 78.49,
+          "quantity": 30,
+          "symbol": "LTC"
         },
         {
           "ID": 4,
-          "assetID": "litecoin",
-          "name": "Litecoin",
-          "portfolioID": 2,
-          "price": 150.75,
-          "quantity": 20,
-          "symbol": "LTC"
+          "assetID": "cardano",
+          "name": "Cardano",
+          "portfolioID": 1,
+          "price": 0.605016,
+          "quantity": 1000,
+          "symbol": "ADA"
         }
       ]
       ```
@@ -784,12 +923,18 @@ prefix for all portfolio management API endpoints (portfolio_controller):
 
 <br>
 <br>
+<br>
 
 ### **Assets management (assets_controller)**
 
+Prefix for all assets management API endpoints (assets_controller):
+
+    http://localhost:5000/assets
+
 ### **1. Retrieve all tradeable assets**
  * **Endpoint:** 'GET' `/assets`<br>
- * **Description:** This endpoint interfaces with the CoinGecko 3rd party API to retrieve a comprehensive list of cryptocurrency assets available on CoinGecko. It is designed to provide users and administrators with up-to-date information about various cryptocurrencies, including names, symbols, current prices, and market data. This functionality is vital for users looking to make informed investment decisions and for admins to monitor cryptocurrency market trends.<br>
+   * `http://localhost:5000/assets`
+ * **Description:** This endpoint interfaces with the CoinGecko 3rd party API to retrieve a comprehensive list of 250 cryptocurrency assets available on CoinGecko. It is designed to provide users and administrators with up-to-date information about various cryptocurrencies, including names, symbols, current prices, and market data. This functionality is vital for users looking to make informed investment decisions and for admins to monitor cryptocurrency market trends.<br>
  * **Request Methods:** `'GET'`
  * **No Authentication Required:** This endpoint is designed to be publicly accessible since it retrieves general market data without exposing sensitive user information.
  * **Success Response Example:**
@@ -881,10 +1026,15 @@ prefix for all portfolio management API endpoints (portfolio_controller):
    * **'200 OK'** If the cryptocurrency asset data is successfully retrieved.
    * **'503 Service Unavailable'** If there is an issue connecting to the CoinGecko API or retrieving data.
 
+<br>
+<br>
+
 #### **2. Retrieve Information of a Single Asset**
- * **Endpoint:** 'GET' `/assets/search/<asset_id>`<br>
+ * **Endpoint:** 'GET' `/assets/search/<string:asset_id>`<br>
+    * `http://localhost:5000/assets/search/<string:asset_id>`
  * **Description:** This endpoint is specifically designed to retrieve updated general market data about a single cryptocurrency asset.<br>
  * **Request Methods:** `'GET'`
+ * **URL Parameters:** '<string:asset_id>' - The unique identifier (string) of the asset to be retrieved.
  * **No Authentication Required:** This endpoint is publicly accessible, considering it provides general market data that does not involve sensitive personal information.
  * **Success Response Example:**
    * If the request is successful, it returns general information about the asset:
@@ -901,7 +1051,7 @@ prefix for all portfolio management API endpoints (portfolio_controller):
    * If the specified asset is not found or there is an issue with the request:
      ```json
      {
-       "error": "Not Found. The specified asset could not be found."
+       "error": "Asset with asset id '{asset_id}' not found"
      }
      ```
  * **Status Codes:**
@@ -925,42 +1075,6 @@ The described Entity-Relationship Diagram (ERD) outlines a database schema for m
 <br>
 
 ## R7 Detail any third party services that your app will use
-
-<!-- ### PyCoinGecko
-**Package:** pycoingecko==3.1.0<br>
-**Service:** CoinGecko<br>
-**Description:** CoinGecko is a cryptocurrency data platform providing information on price, trading volume, market capitalization, and other relevant data for various cryptocurrencies. The pycoingecko library is a client wrapper for the CoinGecko API, allowing your application to fetch cryptocurrency data directly from CoinGecko's extensive database.<br>
-**Use Cases:** This is used within the portfolio_tracker application to display current cryptocurrency prices, market cap rankings, symbols aswel as retrieve a list of the top 250 cryptocurrencies to seed the assets table.
-
-### Flask & Flask-Extensions
-**Package:** Flask==3.0.2, Flask-Bcrypt==1.0.1, Flask-JWT-Extended==4.6.0, Flask-SQLAlchemy==3.1.1, flask-marshmallow==1.2.0<br>
-**Service:** Flask<br>
-**Description:** Flask is a micro web framework written in Python, known for its simplicity, flexibility, and fine-grained control. It is extended by Flask-Extensions like Flask-Bcrypt for hashing passwords, Flask-JWT-Extended for handling JWT tokens for authentication, Flask-SQLAlchemy for providing an ORM layer to interact with databases, and flask-marshmallow for object serialization and deserialization.<br>
-**Use Cases:** These packages collectively support the development of web applications and RESTful APIs, including user authentication, database operations, and data handling within the portfolio_tracker application.
-
-### SQLAlchemy & psycopg2-binary
-**Package:** SQLAlchemy==2.0.27, psycopg2-binary==2.9.9<br>
-**Service:** PostgreSQL<br>
-**Description:** SQLAlchemy is a SQL toolkit and Object-Relational Mapping (ORM) library for Python, facilitating database communication and operations. psycopg2-binary is a PostgreSQL adapter for Python, allowing direct interaction with PostgreSQL databases.<br>
-**Use Cases:** Used together, these libraries enable the portfolio_tracker application to define models, execute database queries, and manage PostgreSQL database connections and transactions smoothly.
-
-### bcrypt & PyJWT
-**Package:** bcrypt==4.1.2, PyJWT==2.8.0<br>
-**Service:** Security and Authentication<br>
-**Description:** bcrypt is a library for hashing passwords in a secure way, providing a mechanism to safely store and verify user passwords. PyJWT is a Python library that allows encoding, decoding, and verifying JSON Web Tokens (JWT), widely used in authenticating and transmitting secure information.<br>
-**Use Cases:** In the portfolio_tracker application, bcrypt is used to hash user passwords before storing them in the database, enhancing security. PyJWT enables the application to implement token-based authentication, allowing secure user sessions and API requests.
-
-### marshmallow
-**Package:** marshmallow==3.21.0<br>
-**Service:** Data Serialization/Deserialization<br>
-**Description:** marshmallow is an ORM/ODM/framework-agnostic library for object serialization and deserialization. It simplifies converting complex data types, such as objects, to and from Python data types.<br>
-**Use Cases:** Within the portfolio_tracker application, marshmallow is utilized for validating and serializing data responses to JSON format and deserializing request data to Python objects, facilitating API data exchange and manipulation.
-
-### requests
-**Package:** requests==2.31.0<br>
-**Service:** HTTP Requests<br>
-**Description:** The requests library is a simple HTTP library for Python, built for human beings. It provides easy methods to make HTTP requests to external services or APIs.<br>
-**Use Cases:** Although not directly mentioned in use cases, the requests library could be utilized within the portfolio_tracker application for interacting with external APIs apart from CoinGecko, or for internal microservice communications, should the need arise. -->
 
 
 ### PyCoinGecko
