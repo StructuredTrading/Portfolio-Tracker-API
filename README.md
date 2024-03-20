@@ -1460,43 +1460,40 @@ In summary, the app utilize's `ForeignKey` relationships to establish associatio
 
 ## R9 Discuss the database relations to be implemented in your application
 
-<!-- In the application, the database relationships are created to support a financial portfolio tracking system. These relationships are key to organizing how data is structured, accessed, and managed, enabling efficient data retrieval and manipulation. Below is a summary of the key relationships and their roles:
-
-### User to Portfolio Relationship
-- **One-to-One**: This critical relationship ensures each user owns a unique portfolio, streamlining user management and access to financial data. A `ForeignKey` constraint on `userID` within the `Portfolio` model guarantees this relationship's exclusivity.
-
-### Portfolio to Transaction Relationship
-- **One-to-Many**: Portfolios can contain many transactions. This setup allows for monitoring of buying and selling, offering a view of a user's financial activities.
-
-### Portfolio to OwnedAsset Relationship
-- **One-to-Many**: This relationship lets a portfolio have many assets, showing a user's diverse investments. It's key for keeping track of how many of each asset a user has and their current value, which is important for understanding how well the portfolio is doing and how investments are spread out.
-
-### Asset to Transaction and OwnedAsset Relationships
-- **One-to-Many**: Assets play a crucial role in transactions and owned assets, with each asset possibly engaged in more then one transactions and held in multiple portfolios. These connections allow for monitoring an asset's performance over time.
-
-The implementation of **cascade delete** options across these relationships is critical for upholding data integrity. When a user is removed, their associated portfolio and all related data (transactions, owned assets) are likewise deleted. Similarly, eliminating a portfolio results in the deletion of its transactions and owned assets, and removing an asset eradicates all linked transactions and owned asset records. This ensures the database remains current and free from orphaned entries.
-
-By establishing these relationships, the application handles and displays financial data, equipping users with valuable, actionable insights into their investments. The thoughtful organization of these relationships fosters strong data interaction patterns, crucial for a detailed portfolio tracking system. -->
-
-
 To discuss the database relations in the application with reference to the Entity-Relationship Diagram (ERD), lets analyze the tables and the types of relationships between them:
 
 #### Users Table:
-* **Attributes:** userID (primary key), email, password, is_admin.
+* **Attributes:** 
+  * userID (primary key, String) 
+  * email 
+  * password 
+  * is_admin
 * **Relationships:**
-  * One-to-Many with Portfolios: Each user can have multiple portfolios, as indicated by the foreign key userID in the portfolios table.
+  * One-to-One with Portfolios: Each user can have a single portfolio, as indicated by the foreign key userID in the portfolios table.
+
+<br>
 
 #### Portfolios Table:
-* **Attributes:** portfolioID (primary key), userID (foreign key), name, description, holdings, date.
+* **Attributes:** 
+  * portfolioID (primary key)
+  * userID (foreign key) 
+  * name
+  * description 
+  * holdings 
+  * date
 * **Relationships:**
   * Many-to-One with Users: Each portfolio belongs to a single user, as indicated by the foreign key userID in the portfolios table.
   * One-to-Many with OwnedAssets: Each portfolio can have multiple owned assets, as indicated by the foreign key portfolioID in the ownedAssets table.
   * One-to-Many with Transactions: Each portfolio can have multiple transactions, as indicated by the foreign key portfolioID in the transactions table.
 
+<br>
+
 #### OwnedAssets Table:
 * **Attributes:** ID (primary key), portfolioID (foreign key), symbol, name, quantity, price.
 * **Relationships:**
   * Many-to-One with Portfolios: Each owned asset belongs to a single portfolio, as indicated by the foreign key portfolioID in the ownedAssets table.
+
+<br>
 
 #### Transactions Table:
 * **Attributes:** transactionsID (primary key), portfolioID (foreign key), assetID (foreign key), transactionType, quantity, price, totalCost, date.
@@ -1504,20 +1501,24 @@ To discuss the database relations in the application with reference to the Entit
   * Many-to-One with Portfolios: Each transaction belongs to a single portfolio, as indicated by the foreign key portfolioID in the transactions table.
   * Many-to-One with Assets: Each transaction involves a single asset, as indicated by the foreign key assetID in the transactions table.
 
+<br>
+
 #### Assets Table:
 * **Attributes:** assetID (primary key), marketCapPos, symbol, name, price.
 * **Relationships:**
   * One-to-Many with Transactions: Each asset can be involved in multiple transactions, as indicated by the foreign key assetID in the transactions table.
   * One-to-Many with OwnedAssets: Each asset can be owned by multiple portfolios, as indicated by the foreign key assetID in the ownedAssets table.
 
+<br>
+
 #### Discussion:
-* The Users table establishes a one-to-many relationship with the Portfolios table, allowing each user to have multiple portfolios.
+* The Users table establishes a one-to-one relationship with the Portfolios table, allowing each user to have a single portfolio.
 Portfolios table has one-to-many relationships with OwnedAssets and Transactions, indicating that each portfolio can contain multiple owned assets and transactions.
 * OwnedAssets table has a many-to-one relationship with the Portfolios table, indicating that each owned asset belongs to a single portfolio.
 * Transactions table has many-to-one relationships with both Portfolios and Assets tables, indicating that each transaction belongs to a single portfolio and involves a single asset.
 * Assets table establishes one-to-many relationships with Transactions and OwnedAssets, indicating that each asset can be involved in multiple transactions and owned by multiple portfolios.
   
-Overall, these relationships form a coherent database structure that allows for efficient organization and management of financial data within our application.
+Overall, these relationships form a coherent database structure that allows for efficient organization and management of financial data within the application.
 
 
 <br>
