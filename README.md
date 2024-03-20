@@ -4,6 +4,39 @@
 <br>
 <br>
 
+### Links
+**<a href="https://trello.com/b/BpbEW080/portfolio-tracker-api">Trello - development plan</a>**<br>
+**<a href="https://github.com/StructuredTrading/Portfolio-Tracker-API">Github - portfolio tracker API app</a>**
+
+<br>
+<br>
+<br>
+
+### Pre-requisite's
+Must have created a database and user with ownership rights of the database or super user privillages. `.env` file must be created using: `.env.sample` as as template.
+
+<br>
+
+### Installing
+Using a terminal, run the following commands:
+
+1. `cd SamOwen_T2A2/src` - Navigate to src folder.
+2. `python3 -m venv .venv` - Create a virtual environment.
+3. `source .venv/bin/activate` - Activate virtual environment.
+4. `pip3 install -r requirements.txt` - Install required packages.
+5. `flask run` - Start the flask server.
+6. `db create` - Create the tables in the database
+7. `db seed` - Seed the tables in the database
+
+<br>
+
+### Testing / Usage
+Open insomnia and import the API endpoints using the `ENDPOINTS.json` file or manually add endpoints using the documentation below.
+
+<br>
+<br>
+<br>
+
 ## R1 Identification of the problem you are trying to solve by building this particular app.
 
 The <b>Portfolio Tracker API</b> for managing investment portfolios is designed to tackle common issues faced by investors, including:
