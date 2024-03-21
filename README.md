@@ -29,7 +29,7 @@ Using a terminal, run the following commands:
 <br>
 
 ### Testing / Usage
-Open insomnia and import the API endpoints using the `ENDPOINTS.json` file or manually add endpoints using the documentation below. Please be sure to follow all instruction's in documentation to ensure correct usage and results.
+Open insomnia and import the API endpoints using the `API-Endpoints` file located in the `/src` folder or manually add endpoints using the documentation below. Please be sure to follow all instruction's in documentation to ensure correct usage and results.
 
 <br>
 <br>
