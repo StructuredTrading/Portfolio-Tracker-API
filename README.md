@@ -1229,26 +1229,6 @@ The described Entity-Relationship Diagram (ERD) outlines a database schema for m
 
 ## R8 Describe your projects models in terms of the relationships they have with each other
 
-<!-- The project's models represent a financial portfolio tracking system with entities such as users, portfolios, transactions, owned assets, and assets. The relationships between these entities are crucial for organizing how data is linked and managed within the system. Here's an overview of the models and their relationships:
-
-### User model and Portfolio model
-- **One-to-One Relationship**: Each `User` is linked to a single `Portfolio`, and vice versa. This connection is made possible by the `portfolio` attribute in the `User` model and the `user` attribute in the `Portfolio` model. A `ForeignKey` on `userID` within the `Portfolio` model ensures this relationship's uniqueness.
-- The `cascade="all, delete"` setting on the `User` model's `portfolio` relationship specifies that deleting a `User` will also remove their associated `Portfolio`.
-
-### Portfolio model and Transaction model
-- **One-to-Many Relationship**: A `Portfolio` can contain many `Transactions`, yet each `Transaction` is associated with only one `Portfolio`. This relationship is represented by the `transaction` attribute in the `Portfolio` model and the `portfolio` attribute in the `Transaction` model, linked by a `ForeignKey` on `portfolioID` in the `Transaction` model.
-- The `cascade="all, delete"` option means that removing a `Portfolio` also deletes all related `Transactions`.
-
-### Portfolio model and OwnedAsset model
-- **One-to-Many Relationship**: A `Portfolio` may also contain multiple `OwnedAssets`, but each `OwnedAsset` relates to a single `Portfolio`. This is managed via the `ownedAssets` relationship in the `Portfolio` model and the `portfolio` relationship in the `OwnedAsset` model, connected by a `ForeignKey` on `portfolioID` in the `OwnedAsset` model.
-- The `cascade="all, delete"` setting ensures the deletion of a `Portfolio` results in the removal of all its `OwnedAssets`.
-
-### Asset, Transaction, and OwnedAsset
-- **One-to-Many Relationship**: An `Asset` is linked to multiple `Transactions` and `OwnedAssets`, though each `Transaction` and `OwnedAsset` corresponds to only one `Asset`. These connections are denoted by the `transaction` and `ownedAssets` attributes in the `Asset` model, and the `asset` attributes in both the `Transaction` and `OwnedAsset` models. `ForeignKey` constraints on `assetID` in the `Transaction` and `OwnedAsset` models facilitate these links.
-- The `cascade="all, delete"` directives for these relationships indicate that erasing an `Asset` also eliminates all associated `Transactions` and `OwnedAssets`.
-
-The relational structure of these models offers a systematic way to manage portfolios, where users own portfolios that include transactions and assets, and assets may be part of transactions or categorized as owned assets. The inclusion of cascading delete options aids in maintaining data integrity and streamlines the management of interconnected data. -->
-
 In the portfolio tracker API , relationships are defined between models using SQLAlchemy, an ORM (Object-Relational Mapping) framework. These relationships are crucial for organizing and managing data within the application. Here's a breakdown of the models and their relationships:
 
 ### User Model:
@@ -1537,18 +1517,45 @@ Overall, the ERD serves as a blueprint for designing and understanding the datab
 
 In the <b>Portfolio tracker API</b> project, task allocation and tracking are streamlined through the use of Trello, a project management tool that facilitates clear visualization of the project timeline and responsibilities. Here's how it's structured:
 
+<br>
+
 #### Trello Board Setup: 
-<img src="./">
+
 I have set up a Trello board specifically for this project, divided into three lists that correspond to the three weeks of the project timeline. Each list represents a week, ensuring tasks are organized according to the timeframe in which they need to be completed.
 
-#### Weekly Lists and Daily Cards: 
+<img src="./docs/Images/Trello/Trello Board - Initial Setup.png"></img>
+
+<br>
+<br>
+
+#### Weekly Lists and Daily Cards:
+
 Within each weekly list, I have created cards that represent specific tasks or activities to be undertaken on particular days. These cards detail what needs to be done, and any relevant deadlines. This structure allows for a day-by-day breakdown of the project's progress.
 
+<img src="./docs/Images/Trello/Week 1 - Progress_1.png"></img>
+
+<br>
+<br>
+
 #### Tracking Progress: 
+
 Task's are sorted directly on Trello by using checklist's on cards with status's from "To Do" to "In Progress" and finally to "Done" as I complete their activities. This visual progression allows me to monitor the project's advancement in real-time and identify any areas that may require additional focus.
+
+<img src="./docs/Images/Trello/Status.png"></img>
+
+<br>
+<br>
 
 #### Adapting to Changes: 
 Given the tight timeline, flexibility is crucial. The Trello board is reviewed and updated to reflect any changes in priorities or task allocations. This agile approach enables me to respond quickly to unforeseen challenges or adjustments in the project scope.
 
+<img src="./docs/Images/Trello/Days 3-4_Setup Development Environment - Done.png"></img>
+
+<br>
+<br>
+
 #### Summary:
+
 By utilizing Trello in this structured yet flexible manner, I maintain a clear overview of the project's progress, ensure tasks are completed efficiently. This methodical approach to task alocation and tracking is instrumental in keeping the project on track within the constrained three-week timeframe.
+
+<img src="./docs/Images/Trello/Completed.png"></img>
