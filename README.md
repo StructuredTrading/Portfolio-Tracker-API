@@ -1177,7 +1177,7 @@ Prefix for all assets management API endpoints (assets_controller):
 ### **Description**
 The described Entity-Relationship Diagram (ERD) outlines a database schema for managing investment portfolios, describing the relationships between users, their investment portfolio, the assets within those portfolios, and the transactions associated to those assets. Here's a overview:
 
-<img src="./Images/Portfolio-Tracker-API_ERD.png"></img>
+<img src="./docs/Images/Portfolio-Tracker-API_ERD.png"></img>
 
 <br>
 <br>
