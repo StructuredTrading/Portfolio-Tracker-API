@@ -18,7 +18,7 @@ Must have created a database and user with ownership rights of the database or s
 ### Installing
 Using a terminal, run the following commands:
 
-1. `cd SamOwen_T2A2/src` - Navigate to src folder.
+1. `cd src` - Navigate to src folder.
 2. `python3 -m venv .venv` - Create a virtual environment.
 3. `source .venv/bin/activate` - Activate virtual environment.
 4. `pip3 install -r requirements.txt` - Install required packages.
