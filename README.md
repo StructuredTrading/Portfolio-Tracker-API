@@ -1185,38 +1185,55 @@ The described Entity-Relationship Diagram (ERD) outlines a database schema for m
 
 ## R7 Detail any third party services that your app will use
 
+<br>
 
-### PyCoinGecko
+#### Third Party Services Used:
+
+This comprehensive list outlines the third-party services that play crucial roles in enhancing the functionality and features of the portfolio tracker app. These services provide essential functionalities such as data retrieval, web framework support, security enhancements, database management, data serialization, and HTTP request handling. By integrating these third-party services into the application, the portfolio tracker becomes more robust, secure, and efficient, offering users a seamless experience in managing their financial portfolios.
+
+<br>
+
+#### PyCoinGecko
 **Package:** pycoingecko==3.1.0<br>
 **Service:** CoinGecko<br>
 **Description:** CoinGecko gives you data about cryptocurrency prices, how much they're being traded, and their market value. The pycoingecko package lets your app get this data straight from CoinGecko.<br>
 **Use Cases:** the portfolio tracker app uses it to show live cryptocurrency prices, how they rank in the market, and their symbols. It also helps retrieve a list of the top 250 cryptocurrencies to update the assets table.
 
-### Flask & Flask-Extensions
+<br>
+
+#### Flask & Flask-Extensions
 **Package:** Flask==3.0.2, Flask-Bcrypt==1.0.1, Flask-JWT-Extended==4.6.0, Flask-SQLAlchemy==3.1.1, flask-marshmallow==1.2.0<br>
 **Service:** Flask<br>
 **Description:** Flask is an easy-to-use web framework for Python. With Flask-Extensions, you can do things like hash passwords (Flask-Bcrypt), manage login tokens (Flask-JWT-Extended), work with databases more easily (Flask-SQLAlchemy), and convert data between formats (flask-marshmallow).<br>
 **Use Cases:** These tools help build and manage portfolio Tracker to handle logins, interact with the database, and work with data easily.
 
-### SQLAlchemy & psycopg2-binary
+<br>
+
+#### SQLAlchemy & psycopg2-binary
 **Package:** SQLAlchemy==2.0.27, psycopg2-binary==2.9.9<br>
 **Service:** PostgreSQL<br>
 **Description:** SQLAlchemy is a toolkit that makes it easier to talk to databases using Python, and psycopg2-binary lets you connect specifically to PostgreSQL databases.<br>
 **Use Cases:** Together, they help to create database models, run queries, and connect to the PostgreSQL database reliably.
 
-### bcrypt & PyJWT
+<br>
+
+#### bcrypt & PyJWT
 **Package:** bcrypt==4.1.2, PyJWT==2.8.0<br>
 **Service:** Security and Authentication<br>
 **Description:** bcrypt helps securely hash passwords, so they're safely stored. PyJWT lets you create, check, and use JWT tokens for logging in and keeping information secure.<br>
 **Use Cases:** bcrypt is used to make sure user passwords are safe. PyJWT helps to manage user logins and keep things secure with tokens.
 
-### marshmallow
+<br>
+
+#### marshmallow
 **Package:** marshmallow==3.21.0<br>
 **Service:** Data Serialization/Deserialization<br>
 **Description:** marshmallow is a tool that helps you convert complex data like objects into simpler Python data types and back.<br>
 **Use Cases:** It's used to check data and convert it to and from JSON format, making it easier to handle API data in the portfolio tracker app.
 
-### requests
+<br>
+
+#### requests
 **Package:** requests==2.31.0<br>
 **Service:** HTTP Requests<br>
 **Description:** The requests package makes it straightforward to send HTTP requests to websites or APIs.<br>
