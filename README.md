@@ -1460,7 +1460,9 @@ In summary, the app utilize's `ForeignKey` relationships to establish associatio
 
 ## R9 Discuss the database relations to be implemented in your application
 
-To discuss the database relations in the application with reference to the Entity-Relationship Diagram (ERD), lets analyze the tables and the types of relationships between them:
+
+#### Entity-Relationship Diagram (ERD) Overview:
+The ERD illustrates the structure of the portfolio tracker database, depicting the entities (tables) and their relationships between each other.
 
 #### Users Table:
 * **Attributes:** 
@@ -1469,7 +1471,7 @@ To discuss the database relations in the application with reference to the Entit
   * password 
   * is_admin
 * **Relationships:**
-  * One-to-One with Portfolios: Each user can have a single portfolio, as indicated by the foreign key userID in the portfolios table.
+  * One-to-One with Portfolios: Illustrated in the ERD, each user can only have a single portfolio. This relationship is established by the foreign key userID in the portfolios table, referencing the primary key userID in the Users table.
 
 <br>
 
@@ -1482,44 +1484,50 @@ To discuss the database relations in the application with reference to the Entit
   * holdings 
   * date
 * **Relationships:**
-  * Many-to-One with Users: Each portfolio belongs to a single user, as indicated by the foreign key userID in the portfolios table.
-  * One-to-Many with OwnedAssets: Each portfolio can have multiple owned assets, as indicated by the foreign key portfolioID in the ownedAssets table.
-  * One-to-Many with Transactions: Each portfolio can have multiple transactions, as indicated by the foreign key portfolioID in the transactions table.
+  * One-to-One with Users: As depicted in the ERD, each portfolio belongs to a single user. This relationship is represented by the foreign key userID in the portfolios table, linking to the primary key userID in the Users table.
+  * One-to-Many with OwnedAssets: The ERD illustrates that each portfolio can have multiple owned assets. This relationship is established by the foreign key portfolioID in the ownedAssets table, referencing the primary key portfolioID in the Portfolios table.
+  * One-to-Many with Transactions: As shown in the ERD, each portfolio can have multiple transactions. This relationship is indicated by the foreign key portfolioID in the transactions table, linking to the primary key portfolioID in the Portfolios table.
 
 <br>
 
 #### OwnedAssets Table:
-* **Attributes:** ID (primary key), portfolioID (foreign key), symbol, name, quantity, price.
+* **Attributes:** 
+  * ID (primary key) 
+  * assetID (foreign key) 
+  * portfolioID (foreign key) 
+  * symbol 
+  * name 
+  * quantity 
+  * price
 * **Relationships:**
-  * Many-to-One with Portfolios: Each owned asset belongs to a single portfolio, as indicated by the foreign key portfolioID in the ownedAssets table.
+  * Many-to-One with Portfolios: As visualized in the ERD, each owned asset belongs to a single portfolio. This relationship is represented by the foreign key portfolioID in the ownedAssets table, referencing the primary key portfolioID in the Portfolios table.
+  * Many-to-One with Assets: As shown in the ERD, each owned asset can only belong to one Asset. This relationship is indicated by the foreign key assetID in the ownedAssets table, linking to the primary key assetID in the Assets table.
 
 <br>
 
 #### Transactions Table:
 * **Attributes:** transactionsID (primary key), portfolioID (foreign key), assetID (foreign key), transactionType, quantity, price, totalCost, date.
 * **Relationships:**
-  * Many-to-One with Portfolios: Each transaction belongs to a single portfolio, as indicated by the foreign key portfolioID in the transactions table.
-  * Many-to-One with Assets: Each transaction involves a single asset, as indicated by the foreign key assetID in the transactions table.
+  * Many-to-One with Portfolios: The ERD illustrates that each transaction belongs to a single portfolio. This relationship is indicated by the foreign key portfolioID in the transactions table, linking to the primary key portfolioID in the Portfolios table.
+  * Many-to-One with Assets: As depicted in the ERD, each transaction involves a single asset. This relationship is established by the foreign key assetID in the transactions table, referencing the primary key assetID in the Assets table.
 
 <br>
 
 #### Assets Table:
 * **Attributes:** assetID (primary key), marketCapPos, symbol, name, price.
 * **Relationships:**
-  * One-to-Many with Transactions: Each asset can be involved in multiple transactions, as indicated by the foreign key assetID in the transactions table.
-  * One-to-Many with OwnedAssets: Each asset can be owned by multiple portfolios, as indicated by the foreign key assetID in the ownedAssets table.
+  * One-to-Many with Transactions: Visualized in the ERD, each asset can be involved in multiple transactions. This relationship is indicated by the foreign key assetID in the transactions table, linking to the primary key assetID in the Assets table.
+  * One-to-Many with OwnedAssets: As shown in the ERD, each asset can be owned by multiple portfolios. This relationship is established by the foreign key assetID in the ownedAssets table, referencing the primary key assetID in the Assets table.
 
 <br>
 
 #### Discussion:
-* The Users table establishes a one-to-one relationship with the Portfolios table, allowing each user to have a single portfolio.
-Portfolios table has one-to-many relationships with OwnedAssets and Transactions, indicating that each portfolio can contain multiple owned assets and transactions.
-* OwnedAssets table has a many-to-one relationship with the Portfolios table, indicating that each owned asset belongs to a single portfolio.
-* Transactions table has many-to-one relationships with both Portfolios and Assets tables, indicating that each transaction belongs to a single portfolio and involves a single asset.
-* Assets table establishes one-to-many relationships with Transactions and OwnedAssets, indicating that each asset can be involved in multiple transactions and owned by multiple portfolios.
-  
-Overall, these relationships form a coherent database structure that allows for efficient organization and management of financial data within the application.
 
+The ERD visually represents the connections between tables in the portfolio tracker database schema. Each relationship depicted in the ERD corresponds to a foreign key constraint in the database tables, ensuring data integrity and coherence.
+
+For example, the ERD illustrates the one-to-many relationship between Portfolios and ownedAssets tables, with the foreign key portfolioID in the ownedAssets table referencing the primary key portfolioID in the Portfolios table. Similarly, the ERD depicts the many-to-one relationship between Transactions and Portfolios, where the foreign key portfolioID in the Transactions table links to the primary key portfolioID in the Portfolios table.
+
+Overall, the ERD serves as a blueprint for designing and understanding the database relations implemented in the portfolio tracker API application, facilitating effective data management and query operations.
 
 <br>
 <br>
@@ -1530,6 +1538,7 @@ Overall, these relationships form a coherent database structure that allows for 
 In the <b>Portfolio tracker API</b> project, task allocation and tracking are streamlined through the use of Trello, a project management tool that facilitates clear visualization of the project timeline and responsibilities. Here's how it's structured:
 
 #### Trello Board Setup: 
+<img src="./">
 I have set up a Trello board specifically for this project, divided into three lists that correspond to the three weeks of the project timeline. Each list represents a week, ensuring tasks are organized according to the timeframe in which they need to be completed.
 
 #### Weekly Lists and Daily Cards: 
